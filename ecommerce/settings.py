@@ -66,6 +66,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                "products.views.navigation_categories",
             ],
         },
     },
@@ -135,3 +136,7 @@ MAILERS = {
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media" 
+
+LOGIN_URL = "accounts:login"
+LOGIN_REDIRECT_URL = "products:product_list"
+LOGOUT_REDIRECT_URL = "products:product_list"

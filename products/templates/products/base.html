@@ -1,0 +1,847 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#155EEF">
+    <meta name="description" content="{% block meta_description %}Discover products from independent vendors at MarketHub.{% endblock %}">
+
+    <title>{% block title %}MarketHub | Shop Online{% endblock %}</title>
+
+    <style>
+        :root {
+            --primary: #155EEF;
+            --primary-dark: #1247B8;
+            --primary-light: #EAF1FF;
+            --accent: #F79009;
+            --accent-dark: #DC6803;
+            --background: #F5F7FA;
+            --surface: #FFFFFF;
+            --text: #202939;
+            --muted: #667085;
+            --border: #EAECF0;
+            --success: #067647;
+            --danger: #B42318;
+            --radius: 12px;
+            --shadow: 0 3px 12px rgba(16, 24, 40, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding-bottom: 0;
+            font-family: Inter, -apple-system, BlinkMacSystemFont,
+                "Segoe UI", sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button, input, select, textarea {
+            font: inherit;
+        }
+
+        button, a {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container {
+            width: min(1200px, calc(100% - 36px));
+            margin-inline: auto;
+        }
+
+        /* Desktop header */
+
+        .top-strip {
+            background: var(--primary-dark);
+            color: white;
+            padding: 7px 0;
+            font-size: 12px;
+        }
+
+        .top-strip-inner {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-inner {
+            min-height: 78px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .brand {
+            flex-shrink: 0;
+            color: var(--primary);
+            font-size: 27px;
+            font-weight: 850;
+            letter-spacing: -1.2px;
+        }
+
+        .brand span {
+            color: var(--accent);
+        }
+
+        .search-form {
+            flex: 1;
+            display: flex;
+            min-width: 100px;
+            height: 46px;
+            background: #F2F4F7;
+            border: 1px solid transparent;
+            border-radius: 24px;
+            overflow: hidden;
+        }
+
+        .search-form:focus-within {
+            background: white;
+            border-color: var(--primary);
+        }
+
+        .search-form input {
+            flex: 1;
+            min-width: 0;
+            padding: 0 18px;
+            border: 0;
+            outline: none;
+            background: transparent;
+        }
+
+        .search-form button {
+            border: 0;
+            padding: 0 22px;
+            background: var(--accent);
+            color: white;
+            font-weight: 750;
+            cursor: pointer;
+        }
+
+        .search-form button:hover {
+            background: var(--accent-dark);
+        }
+
+        .desktop-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 14px;
+            font-weight: 650;
+            white-space: nowrap;
+        }
+
+        .desktop-links a:hover {
+            color: var(--primary);
+        }
+
+        .header-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Main content */
+
+        .main-content {
+            min-height: 70vh;
+            padding-top: 30px;
+            padding-bottom: 60px;
+        }
+
+        .page-heading {
+            margin-bottom: 24px;
+        }
+
+        .page-heading h1 {
+            margin: 0 0 7px;
+            font-size: clamp(24px, 4vw, 32px);
+            line-height: 1.2;
+            letter-spacing: -0.8px;
+        }
+
+        .page-heading p {
+            margin: 0;
+            color: var(--muted);
+        }
+
+        .section {
+            margin-bottom: 28px;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .section-heading h2 {
+            margin: 0;
+            font-size: 21px;
+        }
+
+        .section-heading a {
+            color: var(--accent-dark);
+            font-weight: 750;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 17px;
+            border: 1px solid transparent;
+            border-radius: 9px;
+            background: var(--primary);
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background: var(--primary-dark);
+            color: white;
+        }
+
+        .button-accent {
+            background: var(--accent);
+        }
+
+        .button-accent:hover {
+            background: var(--accent-dark);
+        }
+
+        .button-secondary {
+            color: var(--text);
+            background: white;
+            border-color: var(--border);
+        }
+
+        .button-danger {
+            background: var(--danger);
+        }
+
+        .messages {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 9px;
+            border: 1px solid var(--border);
+            background: white;
+        }
+
+        .message.success {
+            color: var(--success);
+        }
+
+        .message.error {
+            color: var(--danger);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 700;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #D0D5DD;
+            border-radius: 8px;
+            background: white;
+            color: var(--text);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: 2px solid #B2CCFF;
+            border-color: var(--primary);
+        }
+
+        .helptext, .muted {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .errorlist {
+            color: var(--danger);
+            padding-left: 20px;
+        }
+
+        /* Footer */
+
+        .site-footer {
+            padding: 30px 0;
+            background: #101828;
+            color: #D0D5DD;
+        }
+
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 13px;
+        }
+
+        .footer-inner p {
+            margin: 0;
+        }
+
+        
+        /* MarketHub desktop navigation */
+        .mh-header {
+            background: #ffffff;
+            position: relative;
+            z-index: 100;
+        }
+
+        .mh-header-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 28px;
+            min-height: 86px;
+        }
+
+        .mh-header .brand {
+            flex-shrink: 0;
+            font-size: 28px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .mh-header .search-form {
+            flex: 1;
+            max-width: 650px;
+        }
+
+        .mh-quick-links {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            flex-shrink: 0;
+        }
+
+        .mh-quick-links a,
+        .mh-dropdown-toggle {
+            color: #263238;
+            text-decoration: none;
+            font: inherit;
+            font-weight: 600;
+        }
+
+        .mh-dropdown {
+            position: relative;
+        }
+
+        .mh-dropdown-toggle,
+        .mh-help-toggle {
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .mh-dropdown-toggle {
+            padding: 12px 0;
+            white-space: nowrap;
+        }
+
+        .mh-nav-icon {
+            margin-right: 5px;
+        }
+
+        .mh-chevron {
+            margin-left: 4px;
+            color: #667085;
+        }
+
+        .mh-category-nav {
+            display: flex;
+            align-items: stretch;
+            gap: 26px;
+            min-height: 48px;
+            border-top: 1px solid #eaecf0;
+        }
+
+        .mh-category-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .mh-category-link {
+            display: inline-flex;
+            align-items: center;
+            min-height: 48px;
+            padding: 0;
+            color: #344054;
+            background: transparent;
+            border: 0;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .mh-category-link:hover,
+        .mh-quick-links a:hover,
+        .mh-dropdown-toggle:hover {
+            color: #155eef;
+        }
+
+        .mh-dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 230px;
+            padding: 8px;
+            background: #ffffff;
+            border: 1px solid #eaecf0;
+            border-radius: 8px;
+            box-shadow: 0 12px 28px rgba(16, 24, 40, 0.14);
+            z-index: 200;
+        }
+
+        .mh-dropdown-menu a {
+            display: block;
+            padding: 11px 12px;
+            color: #344054;
+            font-size: 14px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .mh-dropdown-menu a:hover,
+        .mh-dropdown-menu a:focus {
+            color: #155eef;
+            background: #f2f6ff;
+        }
+
+        .mh-menu-heading {
+            padding: 12px;
+            color: #101828;
+            font-weight: 700;
+            border-bottom: 1px solid #eaecf0;
+            margin-bottom: 5px;
+        }
+
+        .mh-all-category {
+            font-weight: 700;
+            border-bottom: 1px solid #eaecf0;
+            margin-bottom: 5px;
+        }
+
+        .mh-dropdown:hover > .mh-dropdown-menu,
+        .mh-dropdown:focus-within > .mh-dropdown-menu,
+        .mh-category-item:hover > .mh-dropdown-menu,
+        .mh-category-item:focus-within > .mh-dropdown-menu {
+            display: block;
+        }
+
+        .mh-account-menu {
+            left: auto;
+            right: 0;
+            min-width: 220px;
+        }
+
+        .mh-category-menu {
+            min-width: 245px;
+            max-height: 420px;
+            overflow-y: auto;
+        }
+
+        .mh-help-menu {
+            left: auto;
+            right: 0;
+            min-width: 250px;
+        }
+
+        /* Keep the header usable on smaller desktop windows */
+        @media (max-width: 1050px) {
+            .mh-header-main {
+                gap: 16px;
+                flex-wrap: wrap;
+                padding-top: 14px;
+                padding-bottom: 14px;
+            }
+
+            .mh-header .search-form {
+                order: 3;
+                flex-basis: 100%;
+                max-width: none;
+            }
+
+            .mh-category-nav {
+                gap: 18px;
+                overflow-x: auto;
+            }
+        }
+
+                
+        /* Fix category dropdowns appearing behind the main content */
+        .mh-header {
+            position: relative;
+            z-index: 1000;
+            overflow: visible;
+        }
+
+        .mh-header .container {
+            overflow: visible;
+        }
+
+        .mh-category-nav {
+            position: relative;
+            z-index: 1001;
+            overflow: visible;
+        }
+
+        .mh-category-item {
+            position: relative;
+            z-index: 1002;
+        }
+
+        .mh-dropdown-menu {
+            position: absolute;
+            z-index: 1100;
+            background: #ffffff;
+        }
+
+        /* Ensure the page content stays below the navigation */
+        .main-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Keep dropdowns visible when the pointer moves into them */
+        .mh-category-item:hover > .mh-category-menu,
+        .mh-category-item:focus-within > .mh-category-menu {
+            display: block;
+        }
+
+        .auth-card {
+            max-width: 460px;
+            margin: 40px auto;
+            padding: 30px;
+            background: #ffffff;
+            border: 1px solid #eaecf0;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
+        }
+
+        .auth-card h1 {
+            margin-top: 0;
+            color: #101828;
+        }
+
+        .auth-card p {
+            color: #667085;
+        }
+
+        .auth-card .form-field {
+            margin: 18px 0;
+        }
+
+        .auth-card label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 600;
+        }
+
+        .auth-card input {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d0d5dd;
+            border-radius: 7px;
+        }
+
+        .auth-card button {
+            width: 100%;
+            padding: 12px;
+            border: 0;
+            border-radius: 7px;
+            background: #155eef;
+            color: #ffffff;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .auth-card button:hover {
+            background: #1247b8;
+        }
+
+        .auth-card a {
+            color: #155eef;
+        }
+        
+        .mh-logout-form {
+            margin: 0;
+        }
+
+        .mh-logout-form button {
+            display: block;
+            width: 100%;
+            padding: 11px 12px;
+            border: 0;
+            border-radius: 5px;
+            background: transparent;
+            color: #344054;
+            font: inherit;
+            font-size: 14px;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .mh-logout-form button:hover,
+        .mh-logout-form button:focus {
+            color: #155eef;
+            background: #f2f6ff;
+        }
+
+
+
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+
+<body>
+    <div class="top-strip">
+        <div class="container top-strip-inner">
+            <span>Your marketplace for everyday essentials</span>
+            <span>Discover. Shop. Enjoy.</span>
+        </div>
+    </div>
+
+    
+    <header class="navbar mh-header">
+        <div class="container">
+
+            <!-- Main header row -->
+            <div class="mh-header-main">
+
+                <!-- Logo -->
+                <a class="brand" href="{% url 'products:product_list' %}">
+                    Market<span>Hub</span>
+                </a>
+
+                <!-- Search -->
+                <form class="search-form"
+                    action="{% url 'products:product_list' %}"
+                    method="get"
+                    role="search">
+                    <input
+                        type="search"
+                        name="q"
+                        value="{{ request.GET.q|default:'' }}"
+                        placeholder="Search products, brands and more..."
+                        aria-label="Search products"
+                    >
+                    <button type="submit">Search</button>
+                </form>
+
+                <!-- Account and cart -->
+                <nav class="mh-quick-links" aria-label="Account and cart">
+
+                    <!-- Account dropdown -->
+                    <div class="mh-dropdown">
+                        <button
+                            class="mh-dropdown-toggle"
+                            type="button"
+                            aria-label="Account menu"
+                        >
+                            <span class="mh-nav-icon">♙</span>
+                            Account <span class="mh-chevron">⌄</span>
+                        </button>
+
+                        <div class="mh-dropdown-menu mh-account-menu">
+                            {% if user.is_authenticated %}
+                                <div class="mh-menu-heading">
+                                    Hello, {{ user.username }}
+                                </div>
+
+                                <a href="#my-account">My Account</a>
+                                <a href="#my-orders">My Orders</a>
+
+                                {% if user.role == 'VENDOR' %}
+                                    <a href="{% url 'products:my_products' %}">
+                                        My Products
+                                    </a>
+                                    <a href="{% url 'products:product_create' %}">
+                                        Add a Product
+                                    </a>
+                                {% endif %}
+
+                                <form method="post"
+                                    action="{% url 'accounts:logout' %}"
+                                    class="mh-logout-form">
+                                    {% csrf_token %}
+                                    <button type="submit">Logout</button>
+                                </form>
+                            {% else %}
+                                <div class="mh-menu-heading">
+                                    Welcome to MarketHub
+                                </div>
+
+                                <a href="{% url 'accounts:login' %}">
+                                    Sign In
+                                </a>
+                                <a href="{% url 'accounts:register' %}">
+                                    Create Account
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Cart -->
+                    <a class="mh-cart-link"
+                    href="{% url 'products:product_list' %}#cart">
+                        <span class="mh-nav-icon">🛒</span>
+                        Cart
+                    </a>
+
+                </nav>
+            </div>
+
+            <!-- Category and Help navigation row -->
+            <nav class="mh-category-nav" aria-label="Product categories">
+
+                <!-- Dynamic parent categories -->
+                {% for category in navigation_categories %}
+                    <div class="mh-category-item">
+
+                        <a
+                            class="mh-category-link"
+                            href="{% url 'products:product_list' %}?category={{ category.slug }}"
+                        >
+                            {{ category.name }}
+
+                            {% if category.subcategories.all %}
+                                <span class="mh-chevron">⌄</span>
+                            {% endif %}
+                        </a>
+
+                        <!-- Subcategory dropdown -->
+                        {% if category.subcategories.all %}
+                            <div class="mh-dropdown-menu mh-category-menu">
+
+                                <a
+                                    class="mh-all-category"
+                                    href="{% url 'products:product_list' %}?category={{ category.slug }}"
+                                >
+                                    All {{ category.name }}
+                                </a>
+
+                                {% for subcategory in category.subcategories.all %}
+                                    {% if subcategory.is_active %}
+                                        <a
+                                            href="{% url 'products:product_list' %}?category={{ subcategory.slug }}"
+                                        >
+                                            {{ subcategory.name }}
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </div>
+                        {% endif %}
+
+                    </div>
+                {% endfor %}
+
+                <!-- Help dropdown -->
+                <div class="mh-category-item mh-help-item">
+
+                    <button
+                        class="mh-category-link mh-help-toggle"
+                        type="button"
+                    >
+                        Help <span class="mh-chevron">⌄</span>
+                    </button>
+
+                    <div class="mh-dropdown-menu mh-help-menu">
+                        <div class="mh-menu-heading">
+                            How can we help?
+                        </div>
+
+                        <a href="#help-center">Help Center</a>
+                        <a href="#place-order">Place an Order</a>
+                        <a href="#payment-options">Payment Options</a>
+                        <a href="#delivery-timelines">Delivery Timelines</a>
+                        <a href="#track-order">Track Your Order</a>
+                        <a href="#returns-refunds">Returns &amp; Refunds</a>
+                        <a href="#warranty">Warranty</a>
+                    </div>
+
+                </div>
+
+                {% block nav_extra %}{% endblock %}
+
+            </nav>
+        </div>
+    </header>
+
+
+    <main class="container main-content">
+        {% if messages %}
+            <div class="messages" aria-live="polite">
+                {% for message in messages %}
+                    <div class="message {{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <p><strong>MarketHub</strong> — Discover. Shop. Enjoy.</p>
+            <p>&copy; {% now "Y" %} MarketHub. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

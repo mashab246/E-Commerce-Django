@@ -1,0 +1,344 @@
+
+{% extends "products/base.html" %}
+
+{% block title %}Home | MarketHub{% endblock %}
+
+{% block extra_css %}
+.hero {
+    position: relative;
+    overflow: hidden;
+    min-height: 230px;
+    display: flex;
+    align-items: center;
+    padding: 32px;
+    border-radius: 18px;
+    background: linear-gradient(115deg, #123E9C, #155EEF 62%, #F79009);
+    color: white;
+    margin-bottom: 28px;
+}
+
+.hero-content {
+    max-width: 540px;
+    position: relative;
+    z-index: 1;
+}
+
+.hero h1 {
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.1;
+    margin: 0 0 14px;
+}
+
+.hero p {
+    font-size: 16px;
+    margin: 0 0 22px;
+    color: #EFF4FF;
+}
+
+.hero .button {
+    background: white;
+    color: #155EEF;
+}
+
+.hero-decoration {
+    position: absolute;
+    right: 30px;
+    bottom: -45px;
+    font-size: 170px;
+    opacity: 0.17;
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.category-tile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 14px;
+    min-height: 78px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-weight: 700;
+    transition: transform .15s, border-color .15s;
+}
+
+.category-tile:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary);
+}
+
+.category-icon {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 12px;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 22px;
+}
+
+.sale-panel {
+    padding: 22px;
+    border-radius: 16px;
+    background: #C8102E;
+    color: white;
+}
+
+.sale-panel .section-heading a {
+    color: white;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.product-card {
+    min-width: 0;
+    overflow: hidden;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    transition: box-shadow .15s, transform .15s;
+}
+
+.product-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.product-image {
+    display: grid;
+    place-items: center;
+    height: 190px;
+    padding: 12px;
+    background: white;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.product-placeholder {
+    font-size: 54px;
+    color: #98A2B3;
+}
+
+.product-info {
+    padding: 13px;
+}
+
+.product-name {
+    display: block;
+    min-height: 44px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--text);
+}
+
+.product-price {
+    margin-top: 9px;
+    color: var(--primary);
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.product-vendor {
+    margin-top: 5px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.stock-note {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--success);
+}
+
+.empty-state {
+    padding: 35px 20px;
+    text-align: center;
+    background: white;
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+}
+
+@media (max-width: 760px) {
+    .hero {
+        min-height: 200px;
+        padding: 24px 20px;
+        border-radius: 14px;
+        margin-bottom: 22px;
+    }
+
+    .hero h1 {
+        font-size: 29px;
+    }
+
+    .hero p {
+        max-width: 260px;
+        font-size: 14px;
+    }
+
+    .hero-decoration {
+        right: -15px;
+        bottom: -20px;
+        font-size: 120px;
+    }
+
+    .category-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+    }
+
+    .category-tile {
+        min-height: 68px;
+        padding: 10px;
+        gap: 9px;
+        font-size: 13px;
+    }
+
+    .category-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 19px;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .product-image {
+        height: 155px;
+    }
+
+    .product-info {
+        padding: 10px;
+    }
+
+    .product-price {
+        font-size: 16px;
+    }
+
+    .sale-panel {
+        padding: 14px;
+    }
+}
+
+@media (min-width: 761px) and (max-width: 1000px) {
+    .product-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .category-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+{% endblock %}
+
+{% block content %}
+
+{% if not search_query %}
+<section class="hero">
+    <div class="hero-content">
+        <h1>Everything you need, all in one place.</h1>
+        <p>Discover everyday essentials from vendors on our marketplace.</p>
+        <a class="button" href="#featured-products">
+            Start shopping →
+        </a>
+    </div>
+    <div class="hero-decoration" aria-hidden="true">🛍</div>
+</section>
+{% endif %}
+
+<section class="section" id="featured-products">
+    <div class="section-heading">
+        <h2>
+            {% if search_query %}
+                Search results for "{{ search_query }}"
+            {% else %}
+                Discover Products
+            {% endif %}
+        </h2>
+        <span class="muted">{{ products|length }} products</span>
+    </div>
+
+    <div class="product-grid">
+        {% for product in products %}
+            <article class="product-card">
+                <a href="{% url 'products:product_detail' product.pk product.slug %}">
+                    <div class="product-image">
+                        {% with image=product.images.all|first %}
+                            {% if image %}
+                                <img src="{{ image.image.url }}"
+                                     alt="{{ image.alt_text|default:product.name }}"
+                                     loading="lazy">
+                            {% else %}
+                                <span class="product-placeholder"
+                                      aria-hidden="true">▧</span>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+
+                    <div class="product-info">
+                        <span class="product-name">{{ product.name }}</span>
+                        <div class="product-price">
+                            UGX {{ product.price|floatformat:0 }}
+                        </div>
+                        <div class="product-vendor">
+                            {{ product.vendor.store_name }}
+                        </div>
+                        <div class="stock-note">
+                            {% if product.stock_quantity > 0 %}
+                                In stock
+                            {% else %}
+                                Out of stock
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+            </article>
+        {% empty %}
+            <div class="empty-state" style="grid-column: 1 / -1;">
+                <h3>
+                    {% if search_query %}
+                        No matching products found
+                    {% else %}
+                        Your marketplace is getting ready
+                    {% endif %}
+                </h3>
+                <p class="muted">
+                    {% if search_query %}
+                        Try another search term.
+                    {% else %}
+                        Published products from approved vendors will appear here.
+                    {% endif %}
+                </p>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+{% if not search_query %}
+<section class="section sale-panel">
+    <div class="section-heading">
+        <h2>Discover Great Deals</h2>
+        <a href="#featured-products">Explore products →</a>
+    </div>
+    <p>Find your next favourite product at MarketHub.</p>
+</section>
+{% endif %}
+
+{% endblock %}
