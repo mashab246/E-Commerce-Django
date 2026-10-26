@@ -1,0 +1,94 @@
+
+{% extends "products/base.html" %}
+
+{% block title %}{{ product.name }} | MarketHub{% endblock %}
+
+{% block content %}
+<div class="product-detail-page">
+
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="{% url 'products:product_list' %}">Home</a>
+        <span>/</span>
+        <a href="{% url 'products:category_list' %}">Categories</a>
+        <span>/</span>
+        <span>{{ product.name }}</span>
+    </nav>
+
+    <div class="product-detail-layout">
+
+        <section class="product-detail-image">
+            {% with images=product.images.all %}
+                {% for product_image in images %}
+                    {% if forloop.first %}
+                        <img
+                            src="{{ product_image.image.url }}"
+                            alt="{{ product_image.alt_text|default:product.name }}"
+                            class="product-detail-main-image"
+                        >
+                    {% endif %}
+                {% empty %}
+                    <div class="product-detail-placeholder">
+                        <span>Product image coming soon</span>
+                    </div>
+                {% endfor %}
+            {% endwith %}
+        </section>
+
+
+        <section class="product-detail-info">
+
+            <p class="product-detail-category">
+                {{ product.category.name }}
+            </p>
+
+            <h1>{{ product.name }}</h1>
+
+            {% if product.brand %}
+                <p class="product-detail-brand">
+                    Brand: {{ product.brand.name }}
+                </p>
+            {% endif %}
+
+            <div class="product-detail-price">
+                UGX {{ product.price|floatformat:0 }}
+            </div>
+
+            <div class="product-detail-stock {% if product.stock_quantity > 0 %}in-stock{% else %}out-of-stock{% endif %}">
+                {% if product.stock_quantity > 0 %}
+                    In stock ({{ product.stock_quantity }} available)
+                {% else %}
+                    Out of stock
+                {% endif %}
+            </div>
+
+            {% if product.description %}
+                <div class="product-detail-description">
+                    <h2>Product description</h2>
+                    {{ product.description|linebreaks }}
+                </div>
+            {% endif %}
+
+            <div class="product-detail-vendor">
+                Sold by:
+                <strong>{{ product.vendor }}</strong>
+            </div>
+
+            <div class="product-detail-actions">
+                <button
+                    type="button"
+                    class="button product-detail-cart-button"
+                    disabled
+                >
+                    Add to Cart
+                </button>
+
+                <p class="product-detail-cart-note">
+                    Cart integration will be connected after we verify
+                    your existing cart implementation.
+                </p>
+            </div>
+
+        </section>
+    </div>
+</div>
+{% endblock %}
