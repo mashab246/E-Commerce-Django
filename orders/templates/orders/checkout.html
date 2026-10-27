@@ -1,0 +1,93 @@
+{% extends "products/base.html" %}
+
+{% block content %}
+<div class="checkout-page container">
+    <div class="checkout-header">
+        <h1>Checkout</h1>
+        <p>Confirm your delivery details and review your order.</p>
+    </div>
+
+    <div class="checkout-layout">
+        <section class="checkout-form-section">
+            <h2>Delivery Information</h2>
+
+            <form method="post" class="checkout-form">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="form-errors">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="checkout-field">
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                            {% if field.field.required %}
+                                <span aria-hidden="true">*</span>
+                            {% endif %}
+                        </label>
+
+                        {{ field }}
+
+                        {% if field.help_text %}
+                            <small>{{ field.help_text }}</small>
+                        {% endif %}
+
+                        {% for error in field.errors %}
+                            <p class="field-error">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="button checkout-submit">
+                    Place Order
+                </button>
+            </form>
+        </section>
+
+        <aside class="checkout-summary">
+            <h2>Order Summary</h2>
+
+            {% for item in items %}
+                <div class="checkout-item">
+                    <div class="checkout-item-details">
+                        <strong>{{ item.product.name }}</strong>
+
+                        {% if item.variant %}
+                            <p>Option: {{ item.variant.name }}</p>
+                        {% endif %}
+
+                        <p>Quantity: {{ item.quantity }}</p>
+
+                        <p>
+                            UGX {{ item.unit_price|floatformat:0 }} each
+                        </p>
+                    </div>
+
+                    <strong>
+                        UGX {{ item.subtotal|floatformat:0 }}
+                    </strong>
+                </div>
+            {% empty %}
+                <p>Your cart is empty.</p>
+            {% endfor %}
+
+            <div class="checkout-total">
+                <span>Subtotal</span>
+                <strong>UGX {{ total|floatformat:0 }}</strong>
+            </div>
+
+            <p class="checkout-shipping-note">
+                Shipping and applicable taxes will be confirmed when
+                their pricing rules are configured.
+            </p>
+
+            <a href="{% url 'cart:cart_detail' %}" class="checkout-back-link">
+                Return to cart
+            </a>
+        </aside>
+    </div>
+</div>
+{% endblock %}

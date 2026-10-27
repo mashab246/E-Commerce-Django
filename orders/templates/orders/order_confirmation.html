@@ -1,0 +1,92 @@
+{% extends "products/base.html" %}
+
+{% block content %}
+<div class="checkout-page container">
+    <section class="order-confirmation-card">
+        <div class="order-confirmation-icon" aria-hidden="true">✓</div>
+
+        <h1>Thank you for your order!</h1>
+
+        <p class="order-confirmation-message">
+            Your order has been placed successfully.
+        </p>
+
+        <div class="order-confirmation-number">
+            <span>Order number</span>
+            <strong>{{ order.order_number }}</strong>
+        </div>
+
+        <div class="order-confirmation-details">
+            <div>
+                <span>Order status</span>
+                <strong>{{ order.get_status_display }}</strong>
+            </div>
+
+            <div>
+                <span>Payment method</span>
+                <strong>{{ order.get_payment_method_display }}</strong>
+            </div>
+
+            <div>
+                <span>Payment status</span>
+                <strong>{{ order.get_payment_status_display }}</strong>
+            </div>
+
+            <div>
+                <span>Delivery address</span>
+                <strong>
+                    {{ order.shipping_address }},
+                    {{ order.shipping_city }}
+                    {% if order.shipping_region %}
+                        , {{ order.shipping_region }}
+                    {% endif %}
+                    , {{ order.shipping_country }}
+                </strong>
+            </div>
+        </div>
+
+        <h2>Items ordered</h2>
+
+        {% for vendor_order in order.vendor_orders.all %}
+            <div class="confirmation-vendor">
+                <h3>{{ vendor_order.vendor.store_name }}</h3>
+
+                {% for item in vendor_order.items.all %}
+                    <div class="checkout-item">
+                        <div class="checkout-item-details">
+                            <strong>{{ item.product_name }}</strong>
+                            <p>SKU: {{ item.sku }}</p>
+                            <p>Quantity: {{ item.quantity }}</p>
+                            <p>UGX {{ item.unit_price|floatformat:0 }} each</p>
+                        </div>
+
+                        <strong>
+                            UGX {{ item.line_total|floatformat:0 }}
+                        </strong>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <div class="order-confirmation-total">
+            <span>Subtotal</span>
+            <strong>UGX {{ order.subtotal|floatformat:0 }}</strong>
+        </div>
+
+        <div class="order-confirmation-total">
+            <span>Shipping</span>
+            <strong>UGX {{ order.shipping_cost|floatformat:0 }}</strong>
+        </div>
+
+        <div class="order-confirmation-total order-grand-total">
+            <span>Total</span>
+            <strong>UGX {{ order.total_amount|floatformat:0 }}</strong>
+        </div>
+
+        <a href="{% url 'products:product_list' %}"
+           class="button order-continue-shopping">
+            Continue Shopping
+        </a>
+    </section>
+</div>
+{% endblock %}

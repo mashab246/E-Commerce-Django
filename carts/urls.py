@@ -15,4 +15,9 @@ urlpatterns = [
         views.remove_from_cart,
         name="remove_from_cart",
     ),
+    path(
+        "update/<int:item_id>/",
+        views.update_cart,
+        name="update_cart",
+    ),
 ]

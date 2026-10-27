@@ -1,0 +1,133 @@
+
+{% extends "products/base.html" %}
+
+{% block title %}My Shopping Cart | MarketHub{% endblock %}
+
+{% block content %}
+<section class="cart-page">
+    <div class="page-heading">
+        <h1>My Shopping Cart</h1>
+        <p>Review your items before proceeding to checkout.</p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="cart-message {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if items %}
+        <div class="cart-layout">
+            <div class="cart-items">
+                {% for item in items %}
+                    <article class="cart-item">
+                        <div class="cart-item-image">
+                            {% with images=item.product.images.all %}
+                                {% for product_image in images %}
+                                    {% if forloop.first %}
+                                        <img
+                                            src="{{ product_image.image.url }}"
+                                            alt="{{ product_image.alt_text|default:item.product.name }}"
+                                        >
+                                    {% endif %}
+                                {% empty %}
+                                    <span>No image</span>
+                                {% endfor %}
+                            {% endwith %}
+                        </div>
+
+                        <div class="cart-item-details">
+                            <h2>{{ item.product.name }}</h2>
+
+                            {% if item.variant %}
+                                <div class="cart-item-variant">
+                                    Option: {{ item.variant.name }}
+                                </div>
+                            {% endif %}
+
+                            {% if item.product.brand %}
+                                <p>{{ item.product.brand }}</p>
+                            {% endif %}
+
+                            <p class="cart-item-price">
+                                UGX {{ item.unit_price|floatformat:0 }}
+                            </p>
+
+                            <form
+                                method="post"
+                                action="{% url 'cart:update_cart' item.id %}"
+                                class="cart-quantity-form"
+                            >
+                                {% csrf_token %}
+
+                                <label for="quantity-{{ item.id }}">Quantity</label>
+
+                                <input
+                                    type="number"
+                                    id="quantity-{{ item.id }}"
+                                    name="quantity"
+                                    value="{{ item.quantity }}"
+                                    min="1"
+                                    max="{{ item.product.stock_quantity }}"
+                                    required
+                                >
+
+                                <button type="submit" class="cart-update-button">
+                                    Update
+                                </button>
+                            </form>
+
+                            <form
+                                method="post"
+                                action="{% url 'cart:remove_from_cart' item.id %}"
+                            >
+                                {% csrf_token %}
+                                <button type="submit" class="cart-remove-button">
+                                    Remove
+                                </button>
+                            </form>
+                        </div>
+
+                    </article>
+                {% endfor %}
+            </div>
+
+            <aside class="cart-summary">
+                <h2>Order Summary</h2>
+
+                <div class="cart-summary-row">
+                    <span>Items</span>
+                    <span>{{ items|length }}</span>
+                </div>
+
+                <div class="cart-summary-row cart-total">
+                    <span>Subtotal</span>
+                    <span>UGX {{ total|floatformat:0 }}</span>
+                </div>
+
+                <p class="cart-checkout-note">
+                    Delivery fees and final totals will be calculated at checkout.
+                </p>
+                
+                <a href="{% url 'orders:checkout' %}" class="button checkout-button">
+                    Proceed to Checkout
+                </a>
+
+                <a href="{% url 'products:product_list' %}" class="cart-continue-link">
+                    Continue shopping
+                </a>
+            </aside>
+        </div>
+    {% else %}
+        <div class="cart-empty">
+            <h2>Your cart is empty</h2>
+            <p>Explore MarketHub and add products you'd like to buy.</p>
+            <a href="{% url 'products:product_list' %}" class="button">
+                Start shopping
+            </a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

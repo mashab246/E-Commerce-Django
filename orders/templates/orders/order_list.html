@@ -1,0 +1,83 @@
+{% extends "products/base.html" %}
+
+{% block content %}
+<div class="order-history-page container">
+    <div class="order-history-header">
+        <div>
+            <h1>My Orders</h1>
+            <p>Track your purchases and review your order history.</p>
+        </div>
+        <a href="{% url 'products:product_list' %}" class="button">
+            Continue Shopping
+        </a>
+    </div>
+
+    {% if orders %}
+        <div class="order-history-list">
+            {% for order in orders %}
+                <article class="order-history-card">
+                    <div class="order-history-card-header">
+                        <div>
+                            <span class="order-label">Order number</span>
+                            <strong>{{ order.order_number }}</strong>
+                            <p class="order-date">
+                                Placed {{ order.created_at|date:"d M Y, H:i" }}
+                            </p>
+                        </div>
+
+                        <div class="order-status-group">
+                            <span class="order-status">
+                                {{ order.get_status_display }}
+                            </span>
+                            <span class="payment-status">
+                                {{ order.get_payment_status_display }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="order-history-items">
+                        {% for vendor_order in order.vendor_orders.all %}
+                            {% for item in vendor_order.items.all %}
+                                <div class="order-history-item">
+                                    <div>
+                                        <strong>{{ item.product_name }}</strong>
+                                        <p>Quantity: {{ item.quantity }}</p>
+                                        <small>{{ vendor_order.vendor.store_name }}</small>
+                                    </div>
+                                    <strong>
+                                        UGX {{ item.line_total|floatformat:0 }}
+                                    </strong>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="order-history-card-footer">
+                        <div>
+                            <span>Total paid / due</span>
+                            <strong>
+                                UGX {{ order.total_amount|floatformat:0 }}
+                            </strong>
+                        </div>
+
+                        <a
+                            href="{% url 'orders:order_detail' order.order_number %}"
+                            class="button order-view-button"
+                        >
+                            View Order
+                        </a>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="order-history-empty">
+            <h2>No orders yet</h2>
+            <p>Your purchases will appear here after you place an order.</p>
+            <a href="{% url 'products:product_list' %}" class="button">
+                Explore Products
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

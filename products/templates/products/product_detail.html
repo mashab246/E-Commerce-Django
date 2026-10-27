@@ -72,20 +72,63 @@
                 Sold by:
                 <strong>{{ product.vendor }}</strong>
             </div>
-
+                      
             <div class="product-detail-actions">
-                <button
-                    type="button"
-                    class="button product-detail-cart-button"
-                    disabled
-                >
-                    Add to Cart
-                </button>
+                <form method="post" action="{% url 'cart:add_to_cart' product.id %}">
+                    {% csrf_token %}
 
-                <p class="product-detail-cart-note">
-                    Cart integration will be connected after we verify
-                    your existing cart implementation.
-                </p>
+                    {% if variants %}
+                        <div class="product-detail-variant">
+                            <label for="variant">Choose an option</label>
+                            <select id="variant" name="variant_id" required>
+                                <option value="">Select an option</option>
+                                {% for variant in variants %}
+                                    <option
+                                        value="{{ variant.id }}"
+                                        data-price="{{ variant.effective_price }}"
+                                        data-stock="{{ variant.stock_quantity }}"
+                                        {% if not variant.stock_quantity %}disabled{% endif %}
+                                    >
+                                        {{ variant.name }}
+                                        {% if variant.attributes %}
+                                            — {{ variant.attributes }}
+                                        {% endif %}
+                                        {% if not variant.stock_quantity %}
+                                            (Out of stock)
+                                        {% endif %}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% endif %}
+
+                    <div class="product-detail-quantity">
+                        <label for="quantity">Quantity</label>
+                        <input
+                            type="number"
+                            id="quantity"
+                            name="quantity"
+                            value="1"
+                            min="1"
+                            {% if variants %}
+                                max="1"
+                                disabled
+                            {% else %}
+                                max="{{ product.stock_quantity }}"
+                                {% if product.stock_quantity == 0 %}disabled{% endif %}
+                            {% endif %}
+                            required
+                        >
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="button product-detail-cart-button"
+                        {% if product.stock_quantity == 0 and not variants %}disabled{% endif %}
+                    >
+                        Add to Cart
+                    </button>
+                </form>
             </div>
 
         </section>

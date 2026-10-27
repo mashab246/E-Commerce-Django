@@ -1,0 +1,106 @@
+{% extends "products/base.html" %}
+
+{% block content %}
+<div class="order-history-page container">
+    <div class="order-history-header">
+        <div>
+            <h1>Order Details</h1>
+            <p>Order #{{ order.order_number }}</p>
+            <p>Placed {{ order.created_at|date:"d M Y, H:i" }}</p>
+        </div>
+        <a href="{% url 'orders:order_list' %}" class="button">
+            Back to My Orders
+        </a>
+    </div>
+
+    <div class="order-detail-layout">
+        <section class="order-detail-main">
+            <div class="order-history-card">
+                <h2>Items in Your Order</h2>
+
+                {% for vendor_order in order.vendor_orders.all %}
+                    <div class="confirmation-vendor">
+                        <h3>{{ vendor_order.vendor.store_name }}</h3>
+
+                        {% for item in vendor_order.items.all %}
+                            <div class="order-history-item">
+                                <div>
+                                    <strong>{{ item.product_name }}</strong>
+                                    <p>SKU: {{ item.sku }}</p>
+                                    <p>Quantity: {{ item.quantity }}</p>
+                                    <p>Unit price: UGX {{ item.unit_price|floatformat:0 }}</p>
+                                </div>
+                                <strong>
+                                    UGX {{ item.line_total|floatformat:0 }}
+                                </strong>
+                            </div>
+                        {% endfor %}
+
+                        <div class="order-detail-vendor-total">
+                            <span>Vendor subtotal</span>
+                            <strong>UGX {{ vendor_order.subtotal|floatformat:0 }}</strong>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p>No order items were found.</p>
+                {% endfor %}
+
+                <div class="order-detail-totals">
+                    <div>
+                        <span>Subtotal</span>
+                        <strong>UGX {{ order.subtotal|floatformat:0 }}</strong>
+                    </div>
+                    <div>
+                        <span>Shipping</span>
+                        <strong>UGX {{ order.shipping_cost|floatformat:0 }}</strong>
+                    </div>
+                    <div>
+                        <span>Tax</span>
+                        <strong>UGX {{ order.tax_amount|floatformat:0 }}</strong>
+                    </div>
+                    <div class="order-grand-total">
+                        <span>Total</span>
+                        <strong>UGX {{ order.total_amount|floatformat:0 }}</strong>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <aside class="order-detail-sidebar">
+            <div class="order-history-card">
+                <h2>Order Status</h2>
+                <p>
+                    <span class="order-label">Fulfilment</span>
+                    <strong>{{ order.get_status_display }}</strong>
+                </p>
+                <p>
+                    <span class="order-label">Payment</span>
+                    <strong>{{ order.get_payment_status_display }}</strong>
+                </p>
+                <p>
+                    <span class="order-label">Payment method</span>
+                    <strong>{{ order.get_payment_method_display }}</strong>
+                </p>
+            </div>
+
+            <div class="order-history-card">
+                <h2>Delivery Details</h2>
+                <p><strong>{{ order.shipping_full_name }}</strong></p>
+                <p>{{ order.shipping_phone }}</p>
+                <p>{{ order.shipping_address }}</p>
+                <p>
+                    {{ order.shipping_city }}
+                    {% if order.shipping_region %}, {{ order.shipping_region }}{% endif %}
+                    {% if order.shipping_postal_code %}, {{ order.shipping_postal_code }}{% endif %}
+                </p>
+                <p>{{ order.shipping_country }}</p>
+
+                {% if order.customer_note %}
+                    <h3>Delivery instructions</h3>
+                    <p>{{ order.customer_note|linebreaksbr }}</p>
+                {% endif %}
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}

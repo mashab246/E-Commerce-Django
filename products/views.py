@@ -82,23 +82,30 @@ def product_list(request):
         },
     )
 
-
-
-
 def product_detail(request, pk, slug):
     product = get_object_or_404(
-        Product.objects.select_related("vendor", "category", "brand"),
+        Product.objects.select_related(
+            "vendor",
+            "category",
+            "brand",
+        ).prefetch_related("variants"),
         pk=pk,
         slug=slug,
         status=Product.Status.PUBLISHED,
         vendor__status=Vendor.Status.APPROVED,
     )
 
+    variants = product.variants.filter(is_active=True)
+
     return render(
         request,
         "products/product_detail.html",
-        {"product": product},
+        {
+            "product": product,
+            "variants": variants,
+        },
     )
+
 
 
 @login_required
