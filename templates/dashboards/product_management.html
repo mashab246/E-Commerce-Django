@@ -1,0 +1,197 @@
+{% extends "dashboards/base.html" %}
+
+{% block title %}Product Management | MarketHub{% endblock %}
+
+{% block sidebar_menu %}
+<a href="{% url 'admin_dashboard' %}" class="sidebar-link">
+    Dashboard
+</a>
+
+<a href="{% url 'product_management' %}" class="sidebar-link active">
+    Products
+</a>
+
+<a href="{% url 'products:product_list' %}" class="sidebar-link">
+    View Storefront
+</a>
+{% endblock %}
+
+{% block page_heading %}
+Product Management
+{% endblock %}
+
+{% block user_role %}
+Administrator
+{% endblock %}
+
+{% block content %}
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <div class="stat-label">Total Products</div>
+        <div class="stat-value">{{ total_products }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">Published</div>
+        <div class="stat-value">{{ published_products }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">Drafts</div>
+        <div class="stat-value">{{ draft_products }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">Archived</div>
+        <div class="stat-value">{{ archived_products }}</div>
+    </div>
+
+</div>
+
+<div class="dashboard-panel">
+
+    <div class="panel-header">
+        <h2>Marketplace Products</h2>
+    </div>
+
+    <form method="get" class="user-search-form">
+
+        <input
+            type="search"
+            name="q"
+            value="{{ search_query }}"
+            placeholder="Search product, SKU, vendor or category..."
+        >
+
+        <select name="status">
+            <option value="">All statuses</option>
+
+            <option value="DRAFT"
+                {% if status_filter == "DRAFT" %}selected{% endif %}>
+                Draft
+            </option>
+
+            <option value="PUBLISHED"
+                {% if status_filter == "PUBLISHED" %}selected{% endif %}>
+                Published
+            </option>
+
+            <option value="ARCHIVED"
+                {% if status_filter == "ARCHIVED" %}selected{% endif %}>
+                Archived
+            </option>
+        </select>
+
+        <button type="submit" class="dashboard-btn">
+            Search
+        </button>
+
+        {% if search_query or status_filter %}
+            <a href="{% url 'product_management' %}">Clear</a>
+        {% endif %}
+
+    </form>
+
+    <div class="table-responsive">
+        <table class="dashboard-table">
+
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>SKU</th>
+                    <th>Vendor</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for product in products %}
+                    <tr>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.sku }}</td>
+                        <td>{{ product.vendor.store_name }}</td>
+                        <td>{{ product.category.name }}</td>
+                        <td>UGX {{ product.price|floatformat:0 }}</td>
+                        <td>{{ product.stock_quantity }}</td>
+
+                        <td>
+                            {% if product.status == "PUBLISHED" %}
+                                <span class="status-badge status-approved">
+                                    Published
+                                </span>
+                            {% elif product.status == "DRAFT" %}
+                                <span class="status-badge">
+                                    Draft
+                                </span>
+                            {% else %}
+                                <span class="status-badge status-rejected">
+                                    Archived
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>{{ product.created_at|date:"M d, Y" }}</td>
+
+                        <td class="product-actions">
+                            <a
+                                href="{% url 'products:product_detail' product.pk product.slug %}"
+                                class="product-view-btn"
+                            >
+                                View
+                            </a>
+
+                            <a href="{% url 'admin_product_edit' product.pk %}"
+                            class="product-edit-btn">
+                                Edit
+                            </a>
+                            
+                            <form
+                                method="post"
+                                action="{% url 'update_product_status' product.pk %}"
+                            >
+                                {% csrf_token %}
+
+                                <select name="status" aria-label="New product status">
+                                    {% if product.status != "DRAFT" %}
+                                        <option value="DRAFT">Set to Draft</option>
+                                    {% endif %}
+
+                                    {% if product.status != "PUBLISHED" %}
+                                        <option value="PUBLISHED">Publish</option>
+                                    {% endif %}
+
+                                    {% if product.status != "ARCHIVED" %}
+                                        <option value="ARCHIVED">Archive</option>
+                                    {% endif %}
+                                </select>
+
+                                <button type="submit" class="product-status-btn">
+                                    Update Status
+                                </button>
+                            </form>
+
+                        </td>
+                    </tr>
+
+                {% empty %}
+                    <tr>
+                        <td colspan="8">
+                            No products found.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

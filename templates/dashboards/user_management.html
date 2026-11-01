@@ -1,0 +1,165 @@
+{% extends "dashboards/base.html" %}
+
+{% block title %}User Management | MarketHub{% endblock %}
+
+{% block sidebar_menu %}
+<a href="{% url 'admin_dashboard' %}" class="sidebar-link">
+    Dashboard
+</a>
+
+<a href="{% url 'user_management' %}" class="sidebar-link active">
+    Users
+</a>
+
+<a href="{% url 'products:product_list' %}" class="sidebar-link">
+    View Storefront
+</a>
+{% endblock %}
+
+{% block page_heading %}
+User Management
+{% endblock %}
+
+{% block user_role %}
+Administrator
+{% endblock %}
+
+{% block content %}
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <div class="stat-label">Total Users</div>
+        <div class="stat-value">{{ total_users }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">Active Users</div>
+        <div class="stat-value">{{ active_users }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">Staff Accounts</div>
+        <div class="stat-value">{{ staff_users }}</div>
+    </div>
+
+</div>
+
+<div class="dashboard-panel">
+
+    <div class="panel-header">
+        <h2>Registered Users</h2>
+    </div>
+
+    <form method="get" class="user-search-form">
+        <input
+            type="search"
+            name="q"
+            value="{{ search_query }}"
+            placeholder="Search by username or email..."
+        >
+
+        <button type="submit" class="dashboard-btn">
+            Search
+        </button>
+
+        {% if search_query %}
+            <a href="{% url 'user_management' %}">
+                Clear
+            </a>
+        {% endif %}
+    </form>
+
+    <div class="table-responsive">
+        <table class="dashboard-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Account Status</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for account in users %}
+                    <tr>
+                        <td>{{ account.username }}</td>
+                        <td>{{ account.email }}</td>
+
+                        <td>
+                            {% if account.is_superuser %}
+                                Superuser
+                            {% elif account.is_staff %}
+                                Staff
+                            {% else %}
+                                {{ account.get_role_display|default:"Customer" }}
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if account.is_active %}
+                                <span class="status-badge status-approved">
+                                    Active
+                                </span>
+                            {% else %}
+                                <span class="status-badge status-rejected">
+                                    Inactive
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ account.date_joined|date:"M d, Y" }}
+                        </td>
+
+                        <td>
+                            {% if account.pk == request.user.pk %}
+                                <span class="status-badge">Current account</span>
+
+                            {% elif account.is_superuser %}
+                                <span class="status-badge">Protected</span>
+
+                            {% else %}
+                                <form
+                                    method="post"
+                                    action="{% url 'toggle_user_status' account.pk %}"
+                                >
+                                    {% csrf_token %}
+
+                                    {% if account.is_active %}
+                                        <button
+                                            type="submit"
+                                            class="dashboard-btn"
+                                        >
+                                            Deactivate
+                                        </button>
+                                    {% else %}
+                                        <button
+                                            type="submit"
+                                            class="dashboard-btn"
+                                        >
+                                            Activate
+                                        </button>
+                                    {% endif %}
+                                </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                {% empty %}
+                    <tr>
+                        <td colspan="6">
+                            No users found.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

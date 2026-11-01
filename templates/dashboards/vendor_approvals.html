@@ -1,0 +1,113 @@
+{% extends "dashboards/base.html" %}
+
+{% block title %}Vendor Approvals | MarketHub{% endblock %}
+{% block page_heading %}Vendor Approvals{% endblock %}
+{% block user_role %}Marketplace Administrator{% endblock %}
+
+{% block sidebar_menu %}
+<a href="{% url 'admin_dashboard' %}" class="sidebar-link">
+    <span class="sidebar-icon">▦</span><span>Overview</span>
+</a>
+<a href="{% url 'vendor_approvals' %}" class="sidebar-link active">
+    <span class="sidebar-icon">♧</span><span>Vendor Approvals</span>
+</a>
+<a href="{% url 'products:product_list' %}" class="sidebar-link">
+    <span class="sidebar-icon">↗</span><span>View Storefront</span>
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="welcome-section">
+    <div>
+        <p class="eyebrow">MARKETPLACE MANAGEMENT</p>
+        <h2>Vendor applications</h2>
+        <p class="welcome-description">
+            Review stores and manage vendor access to MarketHub.
+        </p>
+    </div>
+    <div class="welcome-mark">{{ pending_count }}</div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="dashboard-message">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+<section class="panel">
+    <div class="panel-heading">
+        <div>
+            <h3>Registered vendors</h3>
+            <p>{{ vendors|length }} vendor{{ vendors|length|pluralize }} found</p>
+        </div>
+        <span class="live-indicator">{{ pending_count }} pending</span>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="dashboard-table">
+            <thead>
+                <tr>
+                    <th>Store</th>
+                    <th>Owner</th>
+                    <th>Contact</th>
+                    <th>Status</th>
+                    <th>Registered</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for vendor in vendors %}
+                <tr>
+                    <td>
+                        <strong>{{ vendor.store_name }}</strong>
+                        {% if vendor.business_address %}
+                            <span class="table-subtext">{{ vendor.business_address|truncatechars:45 }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ vendor.user.username }}
+                        <span class="table-subtext">{{ vendor.user.email }}</span>
+                    </td>
+                    <td>{{ vendor.phone_number|default:"—" }}</td>
+                    <td>
+                        <span class="status-badge status-{{ vendor.status|lower }}">
+                            {{ vendor.get_status_display }}
+                        </span>
+                    </td>
+                    <td>{{ vendor.created_at|date:"d M Y" }}</td>
+                    <td>
+                        <div class="vendor-actions">
+                            {% if vendor.status != "APPROVED" %}
+                            <form method="post" action="{% url 'update_vendor_status' vendor.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="status" value="APPROVED">
+                                <button type="submit" class="action-button approve-button">
+                                    Approve
+                                </button>
+                            </form>
+                            {% endif %}
+
+                            {% if vendor.status != "REJECTED" %}
+                            <form method="post" action="{% url 'update_vendor_status' vendor.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="status" value="REJECTED">
+                                <button type="submit" class="action-button reject-button">
+                                    Reject
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="empty-table">
+                        No vendor applications found yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

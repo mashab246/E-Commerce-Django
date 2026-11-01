@@ -1,0 +1,161 @@
+
+{% extends "dashboards/base.html" %}
+
+{% block title %}Administrator Dashboard | MarketHub{% endblock %}
+{% block page_heading %}Administrator Dashboard{% endblock %}
+{% block user_role %}Marketplace Administrator{% endblock %}
+
+{% block sidebar_menu %}
+<a href="#" class="sidebar-link active">
+    <span class="sidebar-icon">▦</span>
+    <span>Overview</span>
+</a>
+<a href="{% url 'user_management' %}" class="sidebar-link">
+    <span class="sidebar-icon">♙</span>
+    <span>Users</span>
+</a>
+<a href="{% url 'vendor_approvals' %}" class="sidebar-link">
+    <span class="sidebar-icon">♧</span>
+    <span>Vendor Approvals</span>
+</a>
+<a href="{% url 'product_management' %}" class="sidebar-link">
+    <span class="sidebar-icon">▤</span>
+    <span>Products</span>
+</a>
+<a href="{% url 'category_management' %}" class="sidebar-link">
+    <span class="sidebar-icon">▣</span>
+    <span>Categories</span>
+</a>
+<a href="#" class="sidebar-link">
+    <span class="sidebar-icon">♧</span>
+    <span>Orders</span>
+</a>
+<a href="{% url 'products:product_list' %}" class="sidebar-link">
+    <span class="sidebar-icon">↗</span>
+    <span>View Storefront</span>
+</a>
+{% endblock %}
+
+{% block content %}
+<section class="welcome-section">
+    <div>
+        <p class="eyebrow">MARKETPLACE OVERVIEW</p>
+        <h2>Welcome back, {{ request.user.username }}!</h2>
+        <p class="welcome-description">
+            Here's an overview of your marketplace and its activity.
+        </p>
+    </div>
+    <div class="welcome-mark">MH</div>
+</section>
+
+<section class="stats-grid">
+    <article class="stat-card">
+        <div class="stat-top">
+            <span class="stat-label">Total Users</span>
+            <span class="stat-icon icon-blue">♙</span>
+        </div>
+        <div class="stat-value">{{ total_users }}</div>
+        <div class="stat-note">Registered marketplace users</div>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-top">
+            <span class="stat-label">Total Vendors</span>
+            <span class="stat-icon icon-orange">♧</span>
+        </div>
+        <div class="stat-value">{{ total_vendors }}</div>
+        <div class="stat-note">Stores registered on MarketHub</div>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-top">
+            <span class="stat-label">Total Products</span>
+            <span class="stat-icon icon-purple">▤</span>
+        </div>
+        <div class="stat-value">{{ total_products }}</div>
+        <div class="stat-note">Products listed in the marketplace</div>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-top">
+            <span class="stat-label">Total Orders</span>
+            <span class="stat-icon icon-green">▣</span>
+        </div>
+        <div class="stat-value">{{ total_orders }}</div>
+        <div class="stat-note">Orders placed by customers</div>
+    </article>
+</section>
+
+<section class="dashboard-panels">
+    <article class="panel">
+        <div class="panel-heading">
+            <div>
+                <h3>Marketplace Management</h3>
+                <p>Manage the main areas of your platform.</p>
+            </div>
+        </div>
+
+        <div class="management-list">
+            <div class="management-item">
+                <div class="management-symbol icon-orange">♧</div>
+                <div class="management-copy">
+                    <strong>Vendor Applications</strong>
+                    <span>Review stores requesting approval.</span>
+                </div>
+                <span class="management-arrow">→</span>
+            </div>
+
+            <div class="management-item">
+                <div class="management-symbol icon-blue">▤</div>
+                <div class="management-copy">
+                    <strong>Product Catalogue</strong>
+                    <span>Oversee products listed for sale.</span>
+                </div>
+                <span class="management-arrow">→</span>
+            </div>
+
+            <div class="management-item">
+                <div class="management-symbol icon-green">▣</div>
+                <div class="management-copy">
+                    <strong>Order Management</strong>
+                    <span>Monitor marketplace orders.</span>
+                </div>
+                <span class="management-arrow">→</span>
+            </div>
+        </div>
+    </article>
+
+    <article class="panel platform-panel">
+        <div class="panel-heading">
+            <div>
+                <h3>Platform Status</h3>
+                <p>Your marketplace workspace</p>
+            </div>
+            <span class="live-indicator">● Active</span>
+        </div>
+
+        <div class="platform-brand">
+            <div class="platform-logo">MH</div>
+            <div>
+                <strong>MarketHub</strong>
+                <span>Multi-vendor marketplace</span>
+            </div>
+        </div>
+
+        <div class="platform-divider"></div>
+
+        <div class="platform-detail">
+            <span>Dashboard</span>
+            <strong>Administrator</strong>
+        </div>
+        <div class="platform-detail">
+            <span>Access level</span>
+            <strong>Management</strong>
+        </div>
+
+        <a href="{% url 'products:product_list' %}" class="button-primary">
+            Visit Storefront <span>↗</span>
+        </a>
+    </article>
+</section>
+{% endblock %}

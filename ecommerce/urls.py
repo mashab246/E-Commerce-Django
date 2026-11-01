@@ -18,13 +18,72 @@ from django.contrib import admin
 from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
+from .views import admin_dashboard, vendor_approvals, update_vendor_status, user_management, toggle_user_status, product_management, category_management, category_create, category_edit, toggle_category_status, admin_product_edit, update_product_status
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("dashboard/admin/", admin_dashboard, name="admin_dashboard"),
     path("products/", include("products.urls")),
     path("accounts/", include("accounts.urls")),
     path("cart/", include("carts.urls")),
     path("orders/", include("orders.urls")),
+    path(
+        "dashboard/admin/vendors/",
+        vendor_approvals,
+        name="vendor_approvals",
+    ),
+    path(
+        "dashboard/admin/vendors/<int:vendor_id>/status/",
+        update_vendor_status,
+        name="update_vendor_status",
+    ),
+    path(
+        "dashboard/admin/users/",
+        user_management,
+        name="user_management",
+    ),
+    path(
+        "dashboard/admin/users/<int:user_id>/toggle-status/",
+        toggle_user_status,
+        name="toggle_user_status",
+    ),
+    path(
+        "dashboard/admin/products/",
+        product_management,
+        name="product_management",
+    ),
+    path(
+        "dashboard/admin/categories/",
+        category_management,
+        name="category_management",
+    ),
+    path(
+        "dashboard/admin/categories/add/",
+        category_create,
+        name="category_create",
+    ),
+    path(
+        "dashboard/admin/categories/<int:category_id>/edit/",
+        category_edit,
+        name="category_edit",
+    ),
+    path(
+        "dashboard/admin/categories/<int:category_id>/toggle-status/",
+        toggle_category_status,
+        name="toggle_category_status",
+    ),
+    path(
+        "dashboard/admin/products/<int:product_id>/edit/",
+        admin_product_edit,
+        name="admin_product_edit",
+    ),
+    path(
+        "dashboard/admin/products/<int:product_id>/status/",
+        update_product_status,
+        name="update_product_status",
+    ),
+
 ]
 
 

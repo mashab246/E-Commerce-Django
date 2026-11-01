@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MarketHub Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/dashboards.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="dashboard-body">
+    <div class="dashboard-layout">
+
+        <aside class="sidebar">
+            <a href="{% url 'products:product_list' %}" class="sidebar-brand">
+                Market<span>Hub</span>
+            </a>
+
+            <div class="sidebar-caption">WORKSPACE</div>
+
+            <nav class="sidebar-nav">
+                {% block sidebar_menu %}{% endblock %}
+            </nav>
+
+            <div class="sidebar-footer">
+                <span class="status-dot"></span>
+                Marketplace Management
+            </div>
+        </aside>
+
+        <div class="dashboard-main">
+            <header class="topbar">
+                <div>
+                    <div class="topbar-label">MARKETHUB WORKSPACE</div>
+                    <h1>{% block page_heading %}Dashboard{% endblock %}</h1>
+                </div>
+
+                <div class="topbar-user">
+                    <div class="user-avatar">
+                        {{ request.user.username|first|upper }}
+                    </div>
+                    <div class="user-details">
+                        <strong>{{ request.user.username }}</strong>
+                        <span>{% block user_role %}Marketplace User{% endblock %}</span>
+                    </div>
+                </div>
+            </header>
+
+            <main class="dashboard-content">
+                {% block content %}{% endblock %}
+            </main>
+
+            <footer class="dashboard-footer">
+                <span>MarketHub</span>
+                <span>Marketplace Management System</span>
+            </footer>
+        </div>
+
+    </div>
+</body>
+</html>

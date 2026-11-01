@@ -1,5 +1,5 @@
 from django import forms
-from .models import Product
+from .models import Product, Category
 
 class ProductForm(forms.ModelForm):
     class Meta:
@@ -30,3 +30,65 @@ class ProductForm(forms.ModelForm):
             self.fields["brand"].queryset.filter(is_active=True)
         )
         self.fields["brand"].required = False
+        
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = [
+            "name",
+            "description",
+            "parent",
+        ]
+
+        widgets = {
+            "name": forms.TextInput(
+                attrs={
+                    "placeholder": "Enter category name",
+                }
+            ),
+            "description": forms.Textarea(
+                attrs={
+                    "rows": 4,
+                    "placeholder": "Describe this category (optional)",
+                }
+            ),
+            "parent": forms.Select(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["parent"].required = False
+        self.fields["parent"].empty_label = "Main category (no parent)"
+        
+    def clean_parent(self):
+        parent = self.cleaned_data.get("parent")
+
+        if not parent:
+            return parent
+
+        if self.instance.pk:
+            if parent.pk == self.instance.pk:
+                raise forms.ValidationError(
+                    "A category cannot be its own parent."
+                )
+
+            descendant_ids = set()
+            pending = [self.instance]
+
+            while pending:
+                current = pending.pop()
+
+                children = Category.objects.filter(parent=current)
+
+                for child in children:
+                    if child.pk not in descendant_ids:
+                        descendant_ids.add(child.pk)
+                        pending.append(child)
+
+            if parent.pk in descendant_ids:
+                raise forms.ValidationError(
+                    "A category cannot have one of its descendants as its parent."
+                )
+
+        return parent

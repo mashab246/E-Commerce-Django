@@ -1,0 +1,84 @@
+{% extends "dashboards/base.html" %}
+
+{% block title %}{{ title|default:"Edit Product" }} | MarketHub{% endblock %}
+
+{% block page_heading %}{{ title|default:"Edit Product" }}{% endblock %}
+
+{% block user_role %}Marketplace Administrator{% endblock %}
+
+{% block sidebar_menu %}
+    <a href="{% url 'admin_dashboard' %}" class="sidebar-link">
+        Dashboard
+    </a>
+    <a href="{% url 'product_management' %}" class="sidebar-link active">
+        Product Management
+    </a>
+{% endblock %}
+
+{% block content %}
+<div class="product-edit-page">
+
+    <div class="product-edit-intro">
+        <div>
+            <h2>Edit Product</h2>
+            <p>Update product information in the MarketHub marketplace.</p>
+        </div>
+
+        <a href="{% url 'product_management' %}"
+           class="product-edit-back-btn">
+            Back to Products
+        </a>
+    </div>
+
+    {% if product %}
+    <div class="product-edit-info">
+        <strong>Product:</strong> {{ product.name }}
+        <span>SKU: {{ product.sku }}</span>
+        <span>Vendor: {{ product.vendor.store_name }}</span>
+    </div>
+    {% endif %}
+
+    <div class="product-edit-card">
+        <form method="post" class="product-edit-form">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="product-form-errors">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="product-form-field">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                        {% if field.field.required %}<span>*</span>{% endif %}
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <small>{{ field.help_text }}</small>
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                        <p class="product-field-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <div class="product-edit-actions">
+                <button type="submit" class="product-save-btn">
+                    Save Changes
+                </button>
+
+                <a href="{% url 'product_management' %}"
+                   class="product-cancel-btn">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

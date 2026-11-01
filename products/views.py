@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from vendors.models import Vendor
 from .forms import ProductForm
 from .models import Product, Category
-
+from django.db.models import Q
 
 def get_vendor_for_user(user):
     vendor = getattr(user, "vendor_profile", None)
@@ -19,15 +19,18 @@ def get_vendor_for_user(user):
 
 
 def product_list(request):
+    
     products = (
         Product.objects.filter(
-            status=Product.Status.PUBLISHED,
-            vendor__status=Vendor.Status.APPROVED,
+                status=Product.Status.PUBLISHED,
+                vendor__status=Vendor.Status.APPROVED,
+                category__is_active=True,
+            )
+            .select_related("vendor", "category", "brand")
+            .prefetch_related("images")
+            .order_by("-created_at")
         )
-        .select_related("vendor", "category", "brand")
-        .prefetch_related("images")
-        .order_by("-created_at")
-    )
+
 
     search_query = request.GET.get("q", "").strip()
     category_slug = request.GET.get("category", "").strip()
@@ -93,6 +96,7 @@ def product_detail(request, pk, slug):
         slug=slug,
         status=Product.Status.PUBLISHED,
         vendor__status=Vendor.Status.APPROVED,
+        category__is_active=True,
     )
 
     variants = product.variants.filter(is_active=True)

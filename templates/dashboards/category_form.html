@@ -1,0 +1,118 @@
+{% extends "dashboards/base.html" %}
+
+{% block sidebar_menu %}
+<a href="{% url 'admin_dashboard' %}" class="sidebar-link">
+    Dashboard
+</a>
+
+<a href="{% url 'category_management' %}" class="sidebar-link active">
+    Categories
+</a>
+
+<a href="{% url 'products:product_list' %}" class="sidebar-link">
+    View Storefront
+</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="category-form-page">
+
+    <div class="category-form-intro">
+        <div>
+            <h2>Create a New Category</h2>
+            <p>
+                Organize your marketplace products into categories
+                and subcategories.
+            </p>
+        </div>
+
+        <a href="{% url 'category_management' %}"
+           class="category-back-link">
+            &larr; Back to Categories
+        </a>
+    </div>
+
+    <div class="category-form-card">
+
+        <div class="category-form-card-header">
+            <div class="category-form-icon">C</div>
+            <div>
+                <h3>Category Information</h3>
+                <p>Enter the details for your new category.</p>
+            </div>
+        </div>
+
+        <form method="post" class="category-create-form">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="category-form-errors">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="category-field">
+                <label for="{{ form.name.id_for_label }}">
+                    Category Name <span>*</span>
+                </label>
+                {{ form.name }}
+                {% for error in form.name.errors %}
+                    <small class="category-field-error">{{ error }}</small>
+                {% endfor %}
+                <small class="category-field-help">
+                    Use a clear name, such as Electronics or Clothing.
+                </small>
+            </div>
+
+            <div class="category-field">
+                <label for="{{ form.description.id_for_label }}">
+                    Description
+                </label>
+                {{ form.description }}
+                {% for error in form.description.errors %}
+                    <small class="category-field-error">{{ error }}</small>
+                {% endfor %}
+                <small class="category-field-help">
+                    Explain what products belong in this category.
+                </small>
+            </div>
+
+            <div class="category-field">
+                <label for="{{ form.parent.id_for_label }}">
+                    Parent Category
+                </label>
+                {{ form.parent }}
+                {% for error in form.parent.errors %}
+                    <small class="category-field-error">{{ error }}</small>
+                {% endfor %}
+                <small class="category-field-help">
+                    Leave as Main category to create a top-level category.
+                    Choose a parent to create a subcategory.
+                </small>
+            </div>
+
+            <div class="category-form-note">
+                <strong>Note:</strong>
+                The category URL slug will be generated automatically
+                from its name.
+            </div>
+
+            <div class="category-form-actions">
+                <a href="{% url 'category_management' %}"
+                   class="category-cancel-btn">
+                    Cancel
+                </a>
+
+                <button type="submit" class="category-submit-btn">
+                    {{ submit_label }}
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
