@@ -1,0 +1,164 @@
+{% extends "products/base.html" %}
+
+{% block title %}Order Details | MarketHub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="vendor-order-detail-page">
+
+        <div class="vendor-order-detail-header">
+            <div>
+                <h1>Order Details</h1>
+                <p>
+                    Order {{ vendor_order.order.order_number }}
+                </p>
+            </div>
+
+            <a href="{% url 'vendors:vendor_orders' %}">
+                Back to My Orders
+            </a>
+        </div>
+
+        <div class="vendor-order-detail-card">
+
+            <h2>Order Information</h2>
+
+            <p>
+                <strong>Order Number:</strong>
+                {{ vendor_order.order.order_number }}
+            </p>
+
+            <p>
+                <strong>Order Date:</strong>
+                {{ vendor_order.created_at|date:"d M Y, H:i" }}
+            </p>
+
+            <p>
+                <strong>Vendor Order Status:</strong>
+                {{ vendor_order.get_status_display }}
+            </p>
+
+            <p>
+                <strong>Payment Status:</strong>
+                {{ vendor_order.order.get_payment_status_display }}
+            </p>
+
+            <p>
+                <strong>Payment Method:</strong>
+                {{ vendor_order.order.get_payment_method_display }}
+            </p>
+
+            <h2>Customer Information</h2>
+
+            <p>
+                <strong>Name:</strong>
+                {{ vendor_order.order.shipping_full_name }}
+            </p>
+
+            <p>
+                <strong>Phone:</strong>
+                {{ vendor_order.order.shipping_phone }}
+            </p>
+
+            <p>
+                <strong>Delivery Address:</strong>
+                {{ vendor_order.order.shipping_address }}
+            </p>
+
+            <p>
+                <strong>City:</strong>
+                {{ vendor_order.order.shipping_city }}
+            </p>
+
+            <p>
+                <strong>Region:</strong>
+                {{ vendor_order.order.shipping_region|default:"Not provided" }}
+            </p>
+
+            <p>
+                <strong>Country:</strong>
+                {{ vendor_order.order.shipping_country }}
+            </p>
+
+            {% if vendor_order.order.customer_note %}
+                <p>
+                    <strong>Customer Note:</strong>
+                    {{ vendor_order.order.customer_note }}
+                </p>
+            {% endif %}
+
+            <h2>Products Ordered</h2>
+
+            <table class="vendor-orders-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>SKU</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in vendor_order.items.all %}
+                        <tr>
+                            <td>{{ item.product_name }}</td>
+                            <td>{{ item.sku }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>UGX {{ item.unit_price|floatformat:0 }}</td>
+                            <td>UGX {{ item.line_total|floatformat:0 }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="vendor-order-total">
+                <p>
+                    <strong>Subtotal:</strong>
+                    UGX {{ vendor_order.subtotal|floatformat:0 }}
+                </p>
+
+                <p>
+                    <strong>Shipping:</strong>
+                    UGX {{ vendor_order.shipping_cost|floatformat:0 }}
+                </p>
+
+                <h3>
+                    Total: UGX {{ vendor_order.total_amount|floatformat:0 }}
+                </h3>
+            </div>
+
+        </div>
+
+        <div class="vendor-order-status-card">
+            <h2>Update Order Status</h2>
+
+            <form
+                method="post"
+                action="{% url 'vendors:update_vendor_order_status' vendor_order.pk %}"
+            >
+                {% csrf_token %}
+
+                <label for="status">Select New Status</label>
+
+                <select name="status" id="status" required>
+                    {% for value, label in vendor_order.Status.choices %}
+                        <option
+                            value="{{ value }}"
+                            {% if vendor_order.status == value %}selected{% endif %}
+                        >
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit" class="btn-primary">
+                    Update Status
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

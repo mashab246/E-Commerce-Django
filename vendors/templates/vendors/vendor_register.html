@@ -1,0 +1,64 @@
+{% extends "products/base.html" %}
+
+{% block title %}Become a Vendor | MarketHub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="vendor-registration-page">
+
+        <div class="vendor-registration-header">
+            <h1>Become a MarketHub Vendor</h1>
+            <p>
+                Create your store and start selling your products
+                on MarketHub.
+            </p>
+        </div>
+
+        <div class="vendor-registration-card">
+            <h2>Store Information</h2>
+            <p class="vendor-registration-intro">
+                Complete the information below to submit your
+                vendor application.
+            </p>
+
+            <form method="post" class="vendor-registration-form">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="form-errors">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="checkout-field">
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                            {% if field.field.required %}
+                                <span>*</span>
+                            {% endif %}
+                        </label>
+
+                        {{ field }}
+
+                        {% for error in field.errors %}
+                            <p class="field-error">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+                <div class="vendor-registration-notice">
+                    Your application will be reviewed by the
+                    MarketHub administration team before your
+                    store is approved.
+                </div>
+
+                <button type="submit" class="button">
+                    Submit Vendor Application
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

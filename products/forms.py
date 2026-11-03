@@ -1,7 +1,36 @@
 from django import forms
 from .models import Product, Category
 
+
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class MultipleFileField(forms.FileField):
+    widget = MultipleFileInput
+
+    def clean(self, data, initial=None):
+        if not data:
+            return []
+
+        if isinstance(data, (list, tuple)):
+            return [
+                super(MultipleFileField, self).clean(file, initial)
+                for file in data
+            ]
+
+        return [super().clean(data, initial)]
+
+
 class ProductForm(forms.ModelForm):
+    images = MultipleFileField(
+        required=False,
+        widget=MultipleFileInput(attrs={
+            "accept": "image/*",
+        }),
+        help_text="You can select multiple product images.",
+    )
+
     class Meta:
         model = Product
         fields = [
@@ -30,7 +59,8 @@ class ProductForm(forms.ModelForm):
             self.fields["brand"].queryset.filter(is_active=True)
         )
         self.fields["brand"].required = False
-        
+
+
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
@@ -60,7 +90,7 @@ class CategoryForm(forms.ModelForm):
 
         self.fields["parent"].required = False
         self.fields["parent"].empty_label = "Main category (no parent)"
-        
+
     def clean_parent(self):
         parent = self.cleaned_data.get("parent")
 
@@ -92,3 +122,4 @@ class CategoryForm(forms.ModelForm):
                 )
 
         return parent
+

@@ -1,18 +1,23 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 from vendors.models import Vendor
 from .forms import ProductForm
-from .models import Product, Category
+from .models import Product, Category, ProductImage
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
 
 def get_vendor_for_user(user):
     vendor = getattr(user, "vendor_profile", None)
 
     if vendor is None:
         raise PermissionDenied(
-            "You must have a vendor profile to manage products."
+            "You must register as a vendor before managing products."
+        )
+
+    if vendor.status != Vendor.Status.APPROVED:
+        raise PermissionDenied(
+            "Your vendor account must be approved before managing products."
         )
 
     return vendor
@@ -91,7 +96,10 @@ def product_detail(request, pk, slug):
             "vendor",
             "category",
             "brand",
-        ).prefetch_related("variants"),
+        ).prefetch_related(
+            "variants",
+            "images",
+        ),
         pk=pk,
         slug=slug,
         status=Product.Status.PUBLISHED,
@@ -109,7 +117,6 @@ def product_detail(request, pk, slug):
             "variants": variants,
         },
     )
-
 
 
 @login_required
@@ -134,18 +141,27 @@ def product_create(request):
     vendor = get_vendor_for_user(request.user)
 
     if request.method == "POST":
-        form = ProductForm(request.POST)
+        form = ProductForm(request.POST, request.FILES)
 
         if form.is_valid():
             product = form.save(commit=False)
             product.vendor = vendor
-
-            # Unapproved vendors may save drafts, but cannot publish.
-            if vendor.status != Vendor.Status.APPROVED:
-                product.status = Product.Status.DRAFT
-
             product.save()
-            messages.success(request, "Product created successfully.")
+
+            uploaded_images = form.cleaned_data.get("images", [])
+
+            for index, image in enumerate(uploaded_images):
+                ProductImage.objects.create(
+                    product=product,
+                    image=image,
+                    is_primary=(index == 0),
+                )
+
+            messages.success(
+                request,
+                "Product created successfully."
+            )
+
             return redirect("products:my_products")
     else:
         form = ProductForm()
@@ -153,7 +169,10 @@ def product_create(request):
     return render(
         request,
         "products/product_form.html",
-        {"form": form, "title": "Add Product"},
+        {
+            "form": form,
+            "title": "Add Product",
+        },
     )
 
 
@@ -168,16 +187,31 @@ def product_update(request, pk):
     )
 
     if request.method == "POST":
-        form = ProductForm(request.POST, instance=product)
+        form = ProductForm(
+            request.POST,
+            request.FILES,
+            instance=product,
+        )
 
         if form.is_valid():
-            product = form.save(commit=False)
+            form.save()
 
-            if vendor.status != Vendor.Status.APPROVED:
-                product.status = Product.Status.DRAFT
+            uploaded_images = form.cleaned_data.get("images", [])
 
-            product.save()
-            messages.success(request, "Product updated successfully.")
+            for image in uploaded_images:
+                ProductImage.objects.create(
+                    product=product,
+                    image=image,
+                    is_primary=not product.images.filter(
+                        is_primary=True
+                    ).exists(),
+                )
+
+            messages.success(
+                request,
+                "Product updated successfully."
+            )
+
             return redirect("products:my_products")
     else:
         form = ProductForm(instance=product)
@@ -185,7 +219,11 @@ def product_update(request, pk):
     return render(
         request,
         "products/product_form.html",
-        {"form": form, "title": "Edit Product"},
+        {
+            "form": form,
+            "title": "Edit Product",
+            "product": product,
+        },
     )
 
 

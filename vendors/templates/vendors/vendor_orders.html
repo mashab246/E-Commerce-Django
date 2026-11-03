@@ -1,0 +1,77 @@
+{% extends "products/base.html" %}
+
+{% block title %}My Orders | MarketHub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="vendor-orders-page">
+
+        <div class="vendor-orders-header">
+            <div>
+                <h1>My Store Orders</h1>
+                <p>Manage orders placed for your products.</p>
+            </div>
+
+            <a href="{% url 'vendors:vendor_dashboard' %}">
+                Back to Dashboard
+            </a>
+        </div>
+
+        {% if orders %}
+            <div class="vendor-orders-table-wrapper">
+                <table class="vendor-orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order Number</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for vendor_order in orders %}
+                            <tr>
+                                <td>
+                                    {{ vendor_order.order.order_number }}
+                                </td>
+
+                                <td>
+                                    {{ vendor_order.order.shipping_full_name }}
+                                </td>
+
+                                <td>
+                                    {{ vendor_order.created_at|date:"d M Y" }}
+                                </td>
+
+                                <td>
+                                    UGX {{ vendor_order.total_amount|floatformat:0 }}
+                                </td>
+
+                                <td>
+                                    {{ vendor_order.get_status_display }}
+                                </td>
+
+                                <td>
+                                    <a href="{% url 'vendors:vendor_order_detail' vendor_order.pk %}">
+                                        View Order
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        {% else %}
+            <div class="vendor-orders-empty">
+                <h2>No orders yet</h2>
+                <p>Orders for your store will appear here.</p>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

@@ -3,11 +3,12 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import get_user_model
 from vendors.models import Vendor
 from products.models import Product, Category
-from orders.models import Order
+from orders.models import Order, VendorOrder
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.db.models import Q
 from products.forms import CategoryForm, ProductForm
+
 
 def is_marketplace_admin(user):
     return user.is_staff or user.is_superuser
@@ -365,3 +366,178 @@ def update_product_status(request, product_id):
 
     return redirect("product_management")
 
+@login_required
+@user_passes_test(is_marketplace_admin)
+def order_management(request):
+    search_query = request.GET.get("q", "").strip()
+    status_filter = request.GET.get("status", "").strip()
+    payment_filter = request.GET.get("payment_status", "").strip()
+
+    orders = (
+        Order.objects
+        .select_related("customer")
+        .prefetch_related("vendor_orders")
+        .order_by("-created_at")
+    )
+
+    if search_query:
+        orders = orders.filter(
+            Q(order_number__icontains=search_query)
+            | Q(customer__username__icontains=search_query)
+            | Q(customer__email__icontains=search_query)
+            | Q(shipping_full_name__icontains=search_query)
+            | Q(shipping_phone__icontains=search_query)
+        )
+
+    if status_filter in Order.Status.values:
+        orders = orders.filter(status=status_filter)
+    else:
+        status_filter = ""
+
+    if payment_filter in Order.PaymentStatus.values:
+        orders = orders.filter(payment_status=payment_filter)
+    else:
+        payment_filter = ""
+
+    context = {
+        "orders": orders,
+        "search_query": search_query,
+        "status_filter": status_filter,
+        "payment_filter": payment_filter,
+        "total_orders": Order.objects.count(),
+        "pending_orders": Order.objects.filter(
+            status=Order.Status.PENDING
+        ).count(),
+        "completed_orders": Order.objects.filter(
+            status=Order.Status.DELIVERED
+        ).count(),
+        "cancelled_orders": Order.objects.filter(
+            status=Order.Status.CANCELLED
+        ).count(),
+        "order_statuses": Order.Status.choices,
+        "payment_statuses": Order.PaymentStatus.choices,
+    }
+
+    return render(
+        request,
+        "dashboards/order_management.html",
+        context,
+    )
+
+
+@login_required
+@user_passes_test(is_marketplace_admin)
+def admin_order_detail(request, order_number):
+    order = get_object_or_404(
+        Order.objects
+        .select_related("customer")
+        .prefetch_related(
+            "vendor_orders__vendor",
+            "vendor_orders__items",
+        ),
+        order_number=order_number,
+    )
+
+    return render(
+        request,
+        "dashboards/admin_order_detail.html",
+        {"order": order},
+    )
+
+
+@login_required
+@user_passes_test(is_marketplace_admin)
+@require_POST
+def update_order_status(request, order_number):
+    order = get_object_or_404(Order, order_number=order_number)
+    new_status = request.POST.get("status")
+
+    allowed_statuses = {
+        value for value, label in Order.Status.choices
+    }
+
+    if new_status not in allowed_statuses:
+        messages.error(request, "Invalid order status.")
+        return redirect(
+            "admin_order_detail",
+            order_number=order.order_number,
+        )
+
+    if new_status == order.status:
+        messages.info(request, "The order already has that status.")
+        return redirect(
+            "admin_order_detail",
+            order_number=order.order_number,
+        )
+
+    old_status = order.get_status_display()
+    order.status = new_status
+    order.save(update_fields=["status", "updated_at"])
+
+    messages.success(
+        request,
+        f"Order {order.order_number} changed from "
+        f"{old_status} to {order.get_status_display()}.",
+    )
+
+    return redirect(
+        "admin_order_detail",
+        order_number=order.order_number,
+    )
+    
+@login_required
+@user_passes_test(is_marketplace_admin)
+def payment_management(request):
+    search_query = request.GET.get("q", "").strip()
+    status_filter = request.GET.get("status", "").strip()
+    method_filter = request.GET.get("method", "").strip()
+
+    payments = Order.objects.select_related(
+        "customer"
+    ).order_by("-created_at")
+
+    if search_query:
+        payments = payments.filter(
+            Q(order_number__icontains=search_query)
+            | Q(customer__username__icontains=search_query)
+            | Q(customer__email__icontains=search_query)
+            | Q(shipping_full_name__icontains=search_query)
+        )
+
+    if status_filter in Order.PaymentStatus.values:
+        payments = payments.filter(payment_status=status_filter)
+    else:
+        status_filter = ""
+
+    if method_filter in Order.PaymentMethod.values:
+        payments = payments.filter(payment_method=method_filter)
+    else:
+        method_filter = ""
+
+    context = {
+        "payments": payments,
+        "search_query": search_query,
+        "status_filter": status_filter,
+        "method_filter": method_filter,
+        "payment_statuses": Order.PaymentStatus.choices,
+        "payment_methods": Order.PaymentMethod.choices,
+        "total_payments": Order.objects.count(),
+        "paid_count": Order.objects.filter(
+            payment_status=Order.PaymentStatus.PAID
+        ).count(),
+        "unpaid_count": Order.objects.filter(
+            payment_status=Order.PaymentStatus.UNPAID
+        ).count(),
+        "pending_count": Order.objects.filter(
+            payment_status=Order.PaymentStatus.PENDING
+        ).count(),
+        "failed_count": Order.objects.filter(
+            payment_status=Order.PaymentStatus.FAILED
+        ).count(),
+    }
+
+    return render(
+        request,
+        "dashboards/payment_management.html",
+        context
+    )   

@@ -1,0 +1,40 @@
+{% extends "products/base.html" %}
+
+{% block title %}Archive Product | MarketHub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="archive-product-page">
+
+        <div class="archive-product-card">
+            <h1>Archive Product</h1>
+
+            <p>
+                Are you sure you want to archive
+                <strong>{{ product.name }}</strong>?
+            </p>
+
+            <p class="archive-warning">
+                This product will no longer appear in the public marketplace.
+                Its order and inventory history will be preserved.
+            </p>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="archive-product-actions">
+                    <button type="submit" class="btn-danger">
+                        Yes, Archive Product
+                    </button>
+
+                    <a href="{% url 'products:my_products' %}"
+                       class="btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

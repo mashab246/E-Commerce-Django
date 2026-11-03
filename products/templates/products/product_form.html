@@ -1,84 +1,89 @@
-{% extends "dashboards/base.html" %}
+{% extends "products/base.html" %}
 
-{% block title %}{{ title|default:"Edit Product" }} | MarketHub{% endblock %}
-
-{% block page_heading %}{{ title|default:"Edit Product" }}{% endblock %}
-
-{% block user_role %}Marketplace Administrator{% endblock %}
-
-{% block sidebar_menu %}
-    <a href="{% url 'admin_dashboard' %}" class="sidebar-link">
-        Dashboard
-    </a>
-    <a href="{% url 'product_management' %}" class="sidebar-link active">
-        Product Management
-    </a>
-{% endblock %}
+{% block title %}{{ title }} | MarketHub{% endblock %}
 
 {% block content %}
-<div class="product-edit-page">
+<div class="container">
+    <div class="vendor-product-form-page">
 
-    <div class="product-edit-intro">
-        <div>
-            <h2>Edit Product</h2>
-            <p>Update product information in the MarketHub marketplace.</p>
+        <div class="vendor-product-form-header">
+            <div>
+                <h1>{{ title }}</h1>
+                <p>Add or update a product in your store.</p>
+            </div>
+
+            <a href="{% url 'products:my_products' %}">
+                Back to My Products
+            </a>
         </div>
 
-        <a href="{% url 'product_management' %}"
-           class="product-edit-back-btn">
-            Back to Products
-        </a>
-    </div>
+        <div class="vendor-product-form-card">
+            <form method="post"
+            enctype="multipart/form-data"
+            class="vendor-product-form">
+                {% csrf_token %}
 
-    {% if product %}
-    <div class="product-edit-info">
-        <strong>Product:</strong> {{ product.name }}
-        <span>SKU: {{ product.sku }}</span>
-        <span>Vendor: {{ product.vendor.store_name }}</span>
-    </div>
-    {% endif %}
+                {% if form.non_field_errors %}
+                    <div class="form-errors">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
 
-    <div class="product-edit-card">
-        <form method="post" class="product-edit-form">
-            {% csrf_token %}
+                {% for field in form %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                            {% if field.field.required %}
+                                <span>*</span>
+                            {% endif %}
+                        </label>
 
-            {% if form.non_field_errors %}
-                <div class="product-form-errors">
-                    {{ form.non_field_errors }}
+                        {{ field }}
+
+                        {% if field.help_text %}
+                            <small>{{ field.help_text }}</small>
+                        {% endif %}
+
+                        {% for error in field.errors %}
+                            <p class="field-error">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+                <div class="vendor-product-form-actions">
+                    <button type="submit" class="btn-primary">
+                        Save Product
+                    </button>
+
+                    <a href="{% url 'products:my_products' %}"
+                       class="btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+                {% if product and product.images.exists %}
+    <div class="existing-product-images">
+        <h3>Current Product Images</h3>
+
+        <div class="product-image-preview">
+            {% for product_image in product.images.all %}
+                <div class="product-image-item">
+                    <img
+                        src="{{ product_image.image.url }}"
+                        alt="{{ product_image.alt_text|default:product.name }}"
+                        width="120"
+                    >
+
+                    {% if product_image.is_primary %}
+                        <span>Primary Image</span>
+                    {% endif %}
+                    </div>
+                        {% endfor %}
+                    </div>
                 </div>
             {% endif %}
+            </form>
+        </div>
 
-            {% for field in form %}
-                <div class="product-form-field">
-                    <label for="{{ field.id_for_label }}">
-                        {{ field.label }}
-                        {% if field.field.required %}<span>*</span>{% endif %}
-                    </label>
-
-                    {{ field }}
-
-                    {% if field.help_text %}
-                        <small>{{ field.help_text }}</small>
-                    {% endif %}
-
-                    {% for error in field.errors %}
-                        <p class="product-field-error">{{ error }}</p>
-                    {% endfor %}
-                </div>
-            {% endfor %}
-
-            <div class="product-edit-actions">
-                <button type="submit" class="product-save-btn">
-                    Save Changes
-                </button>
-
-                <a href="{% url 'product_management' %}"
-                   class="product-cancel-btn">
-                    Cancel
-                </a>
-            </div>
-        </form>
     </div>
-
 </div>
 {% endblock %}

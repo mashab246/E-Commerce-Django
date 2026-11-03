@@ -1,0 +1,126 @@
+{% extends "dashboards/base.html" %}
+
+{% block title %}Order Management | MarketHub{% endblock %}
+{% block page_heading %}Order Management{% endblock %}
+{% block user_role %}Marketplace Administrator{% endblock %}
+
+{% block sidebar_menu %}
+<a href="{% url 'admin_dashboard' %}" class="sidebar-link">Dashboard</a>
+<a href="{% url 'order_management' %}" class="sidebar-link active">Order Management</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-stats">
+    <div class="stat-card">
+        <span>Total Orders</span>
+        <h2>{{ total_orders }}</h2>
+    </div>
+    <div class="stat-card">
+        <span>Pending Orders</span>
+        <h2>{{ pending_orders }}</h2>
+    </div>
+    <div class="stat-card">
+        <span>Delivered Orders</span>
+        <h2>{{ completed_orders }}</h2>
+    </div>
+    <div class="stat-card">
+        <span>Cancelled Orders</span>
+        <h2>{{ cancelled_orders }}</h2>
+    </div>
+</div>
+
+<div class="dashboard-panel">
+    <div class="panel-header">
+        <div>
+            <h2>All Orders</h2>
+            <p>Monitor and manage customer orders across the marketplace.</p>
+        </div>
+    </div>
+
+    <form method="GET" class="management-filters">
+        <input
+            type="text"
+            name="q"
+            value="{{ search_query }}"
+            placeholder="Search order number, customer or phone..."
+        >
+
+        <select name="status">
+            <option value="">All Order Statuses</option>
+            {% for value, label in order_statuses %}
+                <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <select name="payment_status">
+            <option value="">All Payment Statuses</option>
+            {% for value, label in payment_statuses %}
+                <option value="{{ value }}" {% if payment_filter == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit" class="primary-btn">Apply Filters</button>
+        <a href="{% url 'order_management' %}" class="secondary-btn">Reset</a>
+    </form>
+
+    <div class="table-responsive">
+        <table class="management-table">
+            <thead>
+                <tr>
+                    <th>Order Number</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Total</th>
+                    <th>Order Status</th>
+                    <th>Payment</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td><strong>{{ order.order_number }}</strong></td>
+                        <td>
+                            {{ order.customer.username }}
+                            <small>{{ order.customer.email }}</small>
+                        </td>
+                        <td>{{ order.created_at|date:"d M Y, H:i" }}</td>
+                        <td>UGX {{ order.total_amount|floatformat:2 }}</td>
+                        <td>
+                            <span class="status-badge status-{{ order.status|lower }}">
+                                {{ order.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-badge status-{{ order.payment_status|lower }}">
+                                {{ order.get_payment_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <a
+                                href="{% url 'admin_order_detail' order.order_number %}"
+                                class="table-action-btn"
+                            >
+                                View Details
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" class="empty-table">
+                            No orders found.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

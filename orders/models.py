@@ -116,6 +116,81 @@ class Order(models.Model):
     def __str__(self):
         return self.order_number
 
+class PaymentTransaction(models.Model):
+
+    class Provider(models.TextChoices):
+        FLUTTERWAVE = "FLUTTERWAVE", "Flutterwave"
+        PESAPAL = "PESAPAL", "Pesapal"
+        MANUAL = "MANUAL", "Manual"
+
+    class Status(models.TextChoices):
+        INITIATED = "INITIATED", "Initiated"
+        PENDING = "PENDING", "Pending"
+        SUCCESSFUL = "SUCCESSFUL", "Successful"
+        FAILED = "FAILED", "Failed"
+        CANCELLED = "CANCELLED", "Cancelled"
+        REFUNDED = "REFUNDED", "Refunded"
+
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.PROTECT,
+        related_name="payment_transactions",
+    )
+
+    provider = models.CharField(
+        max_length=20,
+        choices=Provider.choices,
+        default=Provider.MANUAL,
+    )
+
+    transaction_reference = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+    )
+
+    provider_transaction_id = models.CharField(
+        max_length=150,
+        blank=True,
+        null=True,
+        unique=True,
+    )
+
+    amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal("0.01"))],
+    )
+
+    currency = models.CharField(
+        max_length=3,
+        default="UGX",
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.INITIATED,
+    )
+
+    paid_at = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["order", "status"]),
+            models.Index(fields=["provider", "status"]),
+            models.Index(fields=["created_at"]),
+        ]
+
+    def __str__(self):
+        return f"{self.order.order_number} - {self.transaction_reference}"
 
 class VendorOrder(models.Model):
 

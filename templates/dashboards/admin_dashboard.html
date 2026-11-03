@@ -26,9 +26,13 @@
     <span class="sidebar-icon">▣</span>
     <span>Categories</span>
 </a>
-<a href="#" class="sidebar-link">
+<a href="{% url 'order_management' %}" class="sidebar-link">
     <span class="sidebar-icon">♧</span>
     <span>Orders</span>
+</a>
+<a href="{% url 'payment_management' %}" class="sidebar-link">
+    <span class="sidebar-icon">♧</span>
+    <span>Payments</span>
 </a>
 <a href="{% url 'products:product_list' %}" class="sidebar-link">
     <span class="sidebar-icon">↗</span>

@@ -1,0 +1,120 @@
+{% extends "dashboards/base.html" %}
+
+{% block title %}Payment Management | MarketHub{% endblock %}
+{% block page_heading %}Payment Management{% endblock %}
+{% block user_role %}Administrator{% endblock %}
+
+{% block sidebar_menu %}
+<a href="{% url 'admin_dashboard' %}" class="sidebar-link">Dashboard</a>
+<a href="{% url 'vendor_approvals' %}" class="sidebar-link">Vendors</a>
+<a href="{% url 'user_management' %}" class="sidebar-link">Users</a>
+<a href="{% url 'product_management' %}" class="sidebar-link">Products</a>
+<a href="{% url 'category_management' %}" class="sidebar-link">Categories</a>
+<a href="{% url 'order_management' %}" class="sidebar-link">Orders</a>
+<a href="{% url 'payment_management' %}" class="sidebar-link">Payments</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-stats">
+    <div class="stat-card">
+        <span>Total Orders</span>
+        <h2>{{ total_payments }}</h2>
+    </div>
+
+    <div class="stat-card">
+        <span>Paid</span>
+        <h2>{{ paid_count }}</h2>
+    </div>
+
+    <div class="stat-card">
+        <span>Unpaid</span>
+        <h2>{{ unpaid_count }}</h2>
+    </div>
+
+    <div class="stat-card">
+        <span>Pending</span>
+        <h2>{{ pending_count }}</h2>
+    </div>
+
+    <div class="stat-card">
+        <span>Failed</span>
+        <h2>{{ failed_count }}</h2>
+    </div>
+</div>
+
+<div class="dashboard-panel">
+    <div class="panel-header">
+        <h2>Payment Records</h2>
+        <span>{{ payments|length }} records</span>
+    </div>
+
+    <form method="get" class="management-filters">
+        <input
+            type="text"
+            name="q"
+            placeholder="Search order or customer..."
+            value="{{ search_query }}"
+        >
+
+        <select name="status">
+            <option value="">All Payment Statuses</option>
+            {% for value, label in payment_statuses %}
+                <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <select name="method">
+            <option value="">All Payment Methods</option>
+            {% for value, label in payment_methods %}
+                <option value="{{ value }}" {% if method_filter == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Filter</button>
+        <a href="{% url 'payment_management' %}">Reset</a>
+    </form>
+
+    <div class="management-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Order Number</th>
+                    <th>Customer</th>
+                    <th>Payment Method</th>
+                    <th>Amount</th>
+                    <th>Payment Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for order in payments %}
+                <tr>
+                    <td>{{ order.order_number }}</td>
+                    <td>{{ order.customer.username }}</td>
+                    <td>{{ order.get_payment_method_display }}</td>
+                    <td>UGX {{ order.total_amount|floatformat:0 }}</td>
+                    <td>
+                        <span class="status-badge">
+                            {{ order.get_payment_status_display }}
+                        </span>
+                    </td>
+                    <td>{{ order.created_at|date:"d M Y, H:i" }}</td>
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="6">No payment records found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

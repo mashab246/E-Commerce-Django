@@ -37,12 +37,18 @@
 
                     <div class="order-history-items">
                         {% for vendor_order in order.vendor_orders.all %}
+                            <div class="vendor-order-status">
+                                <strong>{{ vendor_order.vendor.store_name }}</strong>
+                                <span class="order-status">
+                                    {{ vendor_order.get_status_display }}
+                                </span>
+                            </div>
+
                             {% for item in vendor_order.items.all %}
                                 <div class="order-history-item">
                                     <div>
                                         <strong>{{ item.product_name }}</strong>
                                         <p>Quantity: {{ item.quantity }}</p>
-                                        <small>{{ vendor_order.vendor.store_name }}</small>
                                     </div>
                                     <strong>
                                         UGX {{ item.line_total|floatformat:0 }}

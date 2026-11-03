@@ -82,3 +82,39 @@ class OrderItemAdmin(admin.ModelAdmin):
         "created_at",
     )
 
+from django.contrib import admin
+from .models import PaymentTransaction
+
+
+@admin.register(PaymentTransaction)
+class PaymentTransactionAdmin(admin.ModelAdmin):
+    list_display = (
+        "transaction_reference",
+        "order",
+        "provider",
+        "amount",
+        "currency",
+        "status",
+        "paid_at",
+        "created_at",
+    )
+
+    list_filter = (
+        "provider",
+        "status",
+        "currency",
+    )
+
+    search_fields = (
+        "transaction_reference",
+        "provider_transaction_id",
+        "order__order_number",
+        "order__customer__username",
+    )
+
+    readonly_fields = (
+        "transaction_reference",
+        "created_at",
+        "updated_at",
+    )
+    

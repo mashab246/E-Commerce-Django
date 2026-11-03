@@ -1,0 +1,141 @@
+{% extends "dashboards/base.html" %}
+
+{% block title %}Order Details | MarketHub{% endblock %}
+{% block page_heading %}Order Details{% endblock %}
+{% block user_role %}Marketplace Administrator{% endblock %}
+
+{% block sidebar_menu %}
+<a href="{% url 'admin_dashboard' %}" class="sidebar-link">Dashboard</a>
+<a href="{% url 'order_management' %}" class="sidebar-link active">Order Management</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="order-detail-header">
+    <div>
+        <h2>{{ order.order_number }}</h2>
+        <p>Placed {{ order.created_at|date:"d M Y, H:i" }}</p>
+    </div>
+    <a href="{% url 'order_management' %}" class="secondary-btn">
+        Back to Orders
+    </a>
+</div>
+
+<div class="order-detail-grid">
+
+    <section class="dashboard-panel">
+        <h3>Customer Information</h3>
+        <p><strong>Account:</strong> {{ order.customer.username }}</p>
+        <p><strong>Email:</strong> {{ order.customer.email }}</p>
+        <p><strong>Recipient:</strong> {{ order.shipping_full_name }}</p>
+        <p><strong>Phone:</strong> {{ order.shipping_phone }}</p>
+    </section>
+
+    <section class="dashboard-panel">
+        <h3>Shipping Information</h3>
+        <p><strong>Address:</strong> {{ order.shipping_address }}</p>
+        <p><strong>City:</strong> {{ order.shipping_city }}</p>
+        <p><strong>Region:</strong> {{ order.shipping_region|default:"—" }}</p>
+        <p><strong>Postal Code:</strong> {{ order.shipping_postal_code|default:"—" }}</p>
+        <p><strong>Country:</strong> {{ order.shipping_country }}</p>
+    </section>
+
+    <section class="dashboard-panel">
+        <h3>Order Status</h3>
+        <p>
+            Current status:
+            <strong>{{ order.get_status_display }}</strong>
+        </p>
+
+        <form
+            method="POST"
+            action="{% url 'update_order_status' order.order_number %}"
+            onsubmit="return confirm('Are you sure you want to update this order status?');"
+        >
+            {% csrf_token %}
+
+            <label for="order-status">Change order status</label>
+            <select name="status" id="order-status" required>
+                {% for value, label in order.Status.choices %}
+                    <option value="{{ value }}" {% if order.status == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="primary-btn">
+                Update Order Status
+            </button>
+        </form>
+    </section>
+
+    <section class="dashboard-panel">
+        <h3>Payment Information</h3>
+        <p><strong>Method:</strong> {{ order.get_payment_method_display }}</p>
+        <p><strong>Payment Status:</strong> {{ order.get_payment_status_display }}</p>
+        <p><strong>Subtotal:</strong> UGX {{ order.subtotal|floatformat:2 }}</p>
+        <p><strong>Shipping:</strong> UGX {{ order.shipping_cost|floatformat:2 }}</p>
+        <p><strong>Tax:</strong> UGX {{ order.tax_amount|floatformat:2 }}</p>
+        <h3>Total: UGX {{ order.total_amount|floatformat:2 }}</h3>
+    </section>
+
+</div>
+
+<section class="dashboard-panel order-items-panel">
+    <h3>Vendor Orders and Purchased Items</h3>
+
+    {% for vendor_order in order.vendor_orders.all %}
+        <div class="vendor-order-section">
+            <h4>{{ vendor_order.vendor.store_name }}</h4>
+
+            <p>
+                Vendor Order Status:
+                <strong>{{ vendor_order.get_status_display }}</strong>
+            </p>
+
+            <div class="table-responsive">
+                <table class="management-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>SKU</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
+                            <th>Line Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in vendor_order.items.all %}
+                            <tr>
+                                <td>{{ item.product_name }}</td>
+                                <td>{{ item.sku }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>UGX {{ item.unit_price|floatformat:2 }}</td>
+                                <td>UGX {{ item.line_total|floatformat:2 }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5">No items found.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="vendor-order-total">
+                Vendor Total: UGX {{ vendor_order.total_amount|floatformat:2 }}
+            </p>
+        </div>
+    {% empty %}
+        <p>No vendor orders found for this order.</p>
+    {% endfor %}
+</section>
+
+{% if order.customer_note %}
+    <section class="dashboard-panel">
+        <h3>Customer Note</h3>
+        <p>{{ order.customer_note|linebreaksbr }}</p>
+    </section>
+{% endif %}
+
+{% endblock %}

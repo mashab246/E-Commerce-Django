@@ -1,0 +1,99 @@
+{% extends "products/base.html" %}
+
+{% block title %}My Products | MarketHub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="my-products-page">
+
+        <div class="my-products-header">
+            <div>
+                <h1>My Products</h1>
+                <p>Manage the products listed in your store.</p>
+            </div>
+
+            <a href="{% url 'products:product_create' %}"
+               class="btn-primary">
+                + Add New Product
+            </a>
+        </div>
+
+        <div class="my-products-card">
+
+            {% if products %}
+                <div class="table-responsive">
+                    <table class="my-products-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>SKU</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for product in products %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ product.name }}</strong>
+                                    </td>
+
+                                    <td>{{ product.sku }}</td>
+
+                                    <td>{{ product.category.name }}</td>
+
+                                    <td>
+                                        UGX {{ product.price|floatformat:0 }}
+                                    </td>
+
+                                    <td>{{ product.stock_quantity }}</td>
+
+                                    <td>
+                                        <span class="product-status status-{{ product.status|lower }}">
+                                            {{ product.get_status_display }}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <div class="product-actions">
+                                            {% if product.status != "ARCHIVED" %}
+                                                <a href="{% url 'products:product_update' product.pk %}"
+                                                   class="product-action-edit">
+                                                    Edit
+                                                </a>
+
+                                                <a href="{% url 'products:product_delete' product.pk %}"
+                                                   class="product-action-archive">
+                                                    Archive
+                                                </a>
+                                            {% else %}
+                                                <span>Archived</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            {% else %}
+                <div class="empty-products">
+                    <h2>No products yet</h2>
+                    <p>You haven't added any products to your store.</p>
+
+                    <a href="{% url 'products:product_create' %}"
+                       class="btn-primary">
+                        Add Your First Product
+                    </a>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}
