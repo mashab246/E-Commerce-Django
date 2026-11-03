@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
+from django.contrib.auth.views import LoginView
+from django.urls import reverse
 
 User = get_user_model()
 
@@ -34,3 +36,20 @@ def register(request):
         "accounts/register.html",
         {"form": form},
     )
+
+class RoleBasedLoginView(LoginView):
+
+    def get_default_redirect_url(self):
+        user = self.request.user
+
+        # Superusers go to the custom MarketHub admin dashboard
+        if user.is_superuser:
+            return reverse("admin_dashboard")
+
+        # Vendors go to their vendor dashboard
+        if user.role == "VENDOR":
+            return reverse("vendors:vendor_dashboard")
+
+        # Customers go to the storefront
+        return reverse("products:product_list")
+    

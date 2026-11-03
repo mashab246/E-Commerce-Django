@@ -1,109 +1,223 @@
-
-{% extends "products/base.html" %}
+{% extends "dashboards/base.html" %}
 
 {% block title %}Vendor Dashboard | MarketHub{% endblock %}
+{% block page_heading %}Vendor Dashboard{% endblock %}
+{% block user_role %}Marketplace Vendor{% endblock %}
+
+{% block sidebar_menu %}
+<a href="{% url 'vendors:vendor_dashboard' %}" class="sidebar-link active">
+    <span class="sidebar-icon">▦</span>
+    <span>Overview</span>
+</a>
+
+<a href="{% url 'products:my_products' %}" class="sidebar-link">
+    <span class="sidebar-icon">▤</span>
+    <span>My Products</span>
+</a>
+
+<a href="{% url 'products:product_create' %}" class="sidebar-link">
+    <span class="sidebar-icon">＋</span>
+    <span>Add Product</span>
+</a>
+
+<a href="{% url 'vendors:vendor_orders' %}" class="sidebar-link">
+    <span class="sidebar-icon">♧</span>
+    <span>My Orders</span>
+</a>
+
+{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="vendor-dashboard">
-        <div class="vendor-dashboard-header">
-            <div>
-                <h1>{{ vendor.store_name }}</h1>
-                <p>Welcome to your vendor dashboard.</p>
-            </div>
-            <span class="vendor-status">{{ vendor.get_status_display }}</span>
-        </div>
 
-        {% if vendor.status == "PENDING" %}
-            <div class="vendor-notice">
-                Your application is awaiting administrator approval.
-                You will be able to manage your store once it is approved.
-            </div>
-        {% elif vendor.status == "REJECTED" %}
-            <div class="vendor-notice">
-                Your vendor application was not approved. Please contact administration for assistance.
-            </div>
-        {% elif vendor.status == "SUSPENDED" %}
-            <div class="vendor-notice">
-                Your store is currently suspended. Please contact administration.
-            </div>
-        {% else %}
-
-            <!-- Vendor Product Management Actions -->
-            <div class="vendor-dashboard-actions">
-                <a href="{% url 'products:my_products' %}" class="vendor-action-btn">
-                    My Products
-                </a>
-
-                <a href="{% url 'products:product_create' %}" class="vendor-action-btn vendor-action-primary">
-                    + Add Product
-                </a>
-
-                <a href="{% url 'vendors:vendor_orders' %}" class="vendor-action-btn">
-                    My Orders
-                </a>
-            </div>
-            
-            <div class="vendor-stats">
-                <div class="vendor-stat-card">
-                    <h3>Total Products</h3>
-                    <p>{{ total_products }}</p>
-                </div>
-
-                <div class="vendor-stat-card">
-                    <h3>Total Orders</h3>
-                    <p>{{ total_orders }}</p>
-                </div>
-
-                <div class="vendor-stat-card">
-                    <h3>Pending Orders</h3>
-                    <p>{{ pending_orders }}</p>
-                </div>
-
-                <div class="vendor-stat-card">
-                    <h3>Completed Orders</h3>
-                    <p>{{ completed_orders }}</p>
-                </div>
-
-                <div class="vendor-stat-card">
-                    <h3>Delivered Sales</h3>
-                    <p>UGX {{ delivered_sales|floatformat:0 }}</p>
-                </div>
-            </div>
-
-            <div class="vendor-dashboard-section">
-                <h2>Recent Orders</h2>
-
-                {% if recent_orders %}
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Order</th>
-                                    <th>Customer</th>
-                                    <th>Status</th>
-                                    <th>Total</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for order in recent_orders %}
-                                    <tr>
-                                        <td>{{ order.order.order_number }}</td>
-                                        <td>{{ order.order.customer.username }}</td>
-                                        <td>{{ order.get_status_display }}</td>
-                                        <td>UGX {{ order.total_amount|floatformat:0 }}</td>
-                                        <td>{{ order.created_at|date:"d M Y" }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                {% else %}
-                    <p>No orders have been received yet.</p>
-                {% endif %}
-            </div>
-        {% endif %}
+<section class="welcome-section">
+    <div>
+        <p class="eyebrow">VENDOR WORKSPACE</p>
+        <h2>Welcome back, {{ request.user.username }}!</h2>
+        <p class="welcome-description">
+            Manage {{ vendor.store_name }} and monitor your marketplace activity.
+        </p>
     </div>
-</div>
+    <div class="welcome-mark">MH</div>
+</section>
+
+<section class="panel">
+    <div class="panel-heading">
+        <div>
+            <h3>Store Information</h3>
+            <p>{{ vendor.store_name }}</p>
+        </div>
+        <strong>{{ vendor.get_status_display }}</strong>
+    </div>
+
+    {% if vendor.status == "PENDING" %}
+        <p>Your application is awaiting administrator approval.
+        You will be able to manage your store once it is approved.</p>
+
+    {% elif vendor.status == "REJECTED" %}
+        <p>Your vendor application was not approved.
+        Please contact administration for assistance.</p>
+
+    {% elif vendor.status == "SUSPENDED" %}
+        <p>Your store is currently suspended.
+        Please contact administration.</p>
+
+    {% else %}
+
+        <section class="stats-grid">
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-label">Total Products</span>
+                    <span class="stat-icon icon-blue">▤</span>
+                </div>
+                <div class="stat-value">{{ total_products }}</div>
+                <div class="stat-note">Products in your store</div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-label">Total Orders</span>
+                    <span class="stat-icon icon-orange">♧</span>
+                </div>
+                <div class="stat-value">{{ total_orders }}</div>
+                <div class="stat-note">Orders received</div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-label">Pending Orders</span>
+                    <span class="stat-icon icon-purple">◷</span>
+                </div>
+                <div class="stat-value">{{ pending_orders }}</div>
+                <div class="stat-note">Orders awaiting action</div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-label">Completed Orders</span>
+                    <span class="stat-icon icon-green">✓</span>
+                </div>
+                <div class="stat-value">{{ completed_orders }}</div>
+                <div class="stat-note">Delivered orders</div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-label">Delivered Sales</span>
+                    <span class="stat-icon icon-green">UGX</span>
+                </div>
+                <div class="stat-value">UGX {{ delivered_sales|floatformat:0 }}</div>
+                <div class="stat-note">Sales from delivered orders</div>
+            </article>
+        </section>
+
+        <section class="dashboard-panels">
+            <article class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <h3>Store Management</h3>
+                        <p>Manage your products and orders.</p>
+                    </div>
+                </div>
+
+                <div class="management-list">
+                    <a href="{% url 'products:my_products' %}" class="management-item">
+                        <div class="management-symbol icon-blue">▤</div>
+                        <div class="management-copy">
+                            <strong>My Products</strong>
+                            <span>View and manage your listings.</span>
+                        </div>
+                        <span class="management-arrow">→</span>
+                    </a>
+
+                    <a href="{% url 'products:product_create' %}" class="management-item">
+                        <div class="management-symbol icon-orange">＋</div>
+                        <div class="management-copy">
+                            <strong>Add a Product</strong>
+                            <span>List a new product in your store.</span>
+                        </div>
+                        <span class="management-arrow">→</span>
+                    </a>
+
+                    <a href="{% url 'vendors:vendor_orders' %}" class="management-item">
+                        <div class="management-symbol icon-green">♧</div>
+                        <div class="management-copy">
+                            <strong>My Orders</strong>
+                            <span>Review and process customer orders.</span>
+                        </div>
+                        <span class="management-arrow">→</span>
+                    </a>
+                </div>
+            </article>
+
+            <article class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <h3>Store Status</h3>
+                        <p>Your vendor account</p>
+                    </div>
+                </div>
+
+                <div class="platform-brand">
+                    <div class="platform-logo">MH</div>
+                    <div>
+                        <strong>{{ vendor.store_name }}</strong>
+                        <span>{{ vendor.get_status_display }}</span>
+                    </div>
+                </div>
+
+                <div class="platform-divider"></div>
+
+                <div class="platform-detail">
+                    <span>Account</span>
+                    <strong>Vendor</strong>
+                </div>
+                <div class="platform-detail">
+                    <span>Delivered Sales</span>
+                    <strong>UGX {{ delivered_sales|floatformat:0 }}</strong>
+                </div>
+            </article>
+        </section>
+
+        <section class="panel">
+            <div class="panel-heading">
+                <div>
+                    <h3>Recent Orders</h3>
+                    <p>Your latest customer orders.</p>
+                </div>
+                <a href="{% url 'vendors:vendor_orders' %}">View all orders →</a>
+            </div>
+
+            {% if recent_orders %}
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order</th>
+                                <th>Customer</th>
+                                <th>Status</th>
+                                <th>Total</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_orders %}
+                                <tr>
+                                    <td>{{ order.order.order_number }}</td>
+                                    <td>{{ order.order.customer.username }}</td>
+                                    <td>{{ order.get_status_display }}</td>
+                                    <td>UGX {{ order.total_amount|floatformat:0 }}</td>
+                                    <td>{{ order.created_at|date:"d M Y" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p>No orders have been received yet.</p>
+            {% endif %}
+        </section>
+
+    {% endif %}
+</section>
+
 {% endblock %}

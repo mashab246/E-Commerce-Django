@@ -105,6 +105,23 @@
                         <span aria-hidden="true">🛒</span> My Cart
                         <span class="cart-count">{{ cart_item_count }}</span>
                     </a>
+
+                    <!-- Become a Seller -->
+                    {% if user.is_authenticated %}
+                        {% if user.role == 'VENDOR' %}
+                            <a href="{% url 'vendors:vendor_dashboard' %}" class="nav-link">
+                                Sell on MarketHub
+                            </a>
+                        {% else %}
+                            <a href="{% url 'vendors:vendor_register' %}" class="nav-link">
+                                Become a Seller
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'vendors:vendor_register' %}" class="nav-link">
+                            Become a Seller
+                        </a>
+                    {% endif %}
                     
                     {% if user.is_authenticated %}
                         <a href="{% url 'orders:order_list' %}">My Orders</a>

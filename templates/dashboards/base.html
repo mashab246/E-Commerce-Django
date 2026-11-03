@@ -23,8 +23,18 @@
             </nav>
 
             <div class="sidebar-footer">
-                <span class="status-dot"></span>
-                Marketplace Management
+                <form method="post" action="{% url 'accounts:logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="sidebar-logout">
+                        <span>↪</span>
+                        Logout
+                    </button>
+                </form>
+
+                <div class="sidebar-status">
+                    <span class="status-dot"></span>
+                    Marketplace Management
+                </div>
             </div>
         </aside>
 

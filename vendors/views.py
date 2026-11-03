@@ -189,8 +189,14 @@ def update_vendor_order_status(request, pk):
 
     new_status = request.POST.get("status")
 
+    if vendor_order.status == VendorOrder.Status.CANCELLED:
+        messages.error(request, "This order has already been cancelled.")
+        return redirect("vendors:vendor_order_detail", pk=vendor_order.pk)
+
     valid_statuses = [
-        choice[0] for choice in VendorOrder.Status.choices
+        choice[0]
+        for choice in VendorOrder.Status.choices
+        if choice[0] != VendorOrder.Status.CANCELLED
     ]
 
     if new_status not in valid_statuses:

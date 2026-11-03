@@ -29,6 +29,21 @@
                             </strong>
                         </p>
 
+                        {% if vendor_order.status == "PENDING" %}
+                            <form
+                                method="post"
+                                action="{% url 'orders:cancel_vendor_order' vendor_order.pk %}"
+                                onsubmit="return confirm('Are you sure you want to cancel this vendor order?');"
+                            >
+                                {% csrf_token %}
+                                <button type="submit" class="button">
+                                    Cancel This Vendor Order
+                                </button>
+                            </form>
+                        {% elif vendor_order.status == "CANCELLED" %}
+                            <p class="order-status">This vendor order has been cancelled.</p>
+                        {% endif %}
+
                         {% for item in vendor_order.items.all %}
                             <div class="order-history-item">
                                 <div>

@@ -1,164 +1,194 @@
-{% extends "products/base.html" %}
+
+{% extends "dashboards/base.html" %}
 
 {% block title %}Order Details | MarketHub{% endblock %}
+{% block page_heading %}Order Details{% endblock %}
+{% block user_role %}Marketplace Vendor{% endblock %}
+
+{% block sidebar_menu %}
+<a href="{% url 'vendors:vendor_dashboard' %}" class="sidebar-link">
+    <span class="sidebar-icon">▦</span>
+    <span>Overview</span>
+</a>
+
+<a href="{% url 'vendors:vendor_orders' %}" class="sidebar-link active">
+    <span class="sidebar-icon">♧</span>
+    <span>My Orders</span>
+</a>
+
+{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="vendor-order-detail-page">
 
-        <div class="vendor-order-detail-header">
-            <div>
-                <h1>Order Details</h1>
-                <p>
-                    Order {{ vendor_order.order.order_number }}
-                </p>
-            </div>
-
-            <a href="{% url 'vendors:vendor_orders' %}">
-                Back to My Orders
-            </a>
-        </div>
-
-        <div class="vendor-order-detail-card">
-
-            <h2>Order Information</h2>
-
-            <p>
-                <strong>Order Number:</strong>
-                {{ vendor_order.order.order_number }}
-            </p>
-
-            <p>
-                <strong>Order Date:</strong>
-                {{ vendor_order.created_at|date:"d M Y, H:i" }}
-            </p>
-
-            <p>
-                <strong>Vendor Order Status:</strong>
-                {{ vendor_order.get_status_display }}
-            </p>
-
-            <p>
-                <strong>Payment Status:</strong>
-                {{ vendor_order.order.get_payment_status_display }}
-            </p>
-
-            <p>
-                <strong>Payment Method:</strong>
-                {{ vendor_order.order.get_payment_method_display }}
-            </p>
-
-            <h2>Customer Information</h2>
-
-            <p>
-                <strong>Name:</strong>
-                {{ vendor_order.order.shipping_full_name }}
-            </p>
-
-            <p>
-                <strong>Phone:</strong>
-                {{ vendor_order.order.shipping_phone }}
-            </p>
-
-            <p>
-                <strong>Delivery Address:</strong>
-                {{ vendor_order.order.shipping_address }}
-            </p>
-
-            <p>
-                <strong>City:</strong>
-                {{ vendor_order.order.shipping_city }}
-            </p>
-
-            <p>
-                <strong>Region:</strong>
-                {{ vendor_order.order.shipping_region|default:"Not provided" }}
-            </p>
-
-            <p>
-                <strong>Country:</strong>
-                {{ vendor_order.order.shipping_country }}
-            </p>
-
-            {% if vendor_order.order.customer_note %}
-                <p>
-                    <strong>Customer Note:</strong>
-                    {{ vendor_order.order.customer_note }}
-                </p>
-            {% endif %}
-
-            <h2>Products Ordered</h2>
-
-            <table class="vendor-orders-table">
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>SKU</th>
-                        <th>Quantity</th>
-                        <th>Unit Price</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {% for item in vendor_order.items.all %}
-                        <tr>
-                            <td>{{ item.product_name }}</td>
-                            <td>{{ item.sku }}</td>
-                            <td>{{ item.quantity }}</td>
-                            <td>UGX {{ item.unit_price|floatformat:0 }}</td>
-                            <td>UGX {{ item.line_total|floatformat:0 }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-            <div class="vendor-order-total">
-                <p>
-                    <strong>Subtotal:</strong>
-                    UGX {{ vendor_order.subtotal|floatformat:0 }}
-                </p>
-
-                <p>
-                    <strong>Shipping:</strong>
-                    UGX {{ vendor_order.shipping_cost|floatformat:0 }}
-                </p>
-
-                <h3>
-                    Total: UGX {{ vendor_order.total_amount|floatformat:0 }}
-                </h3>
-            </div>
-
-        </div>
-
-        <div class="vendor-order-status-card">
-            <h2>Update Order Status</h2>
-
-            <form
-                method="post"
-                action="{% url 'vendors:update_vendor_order_status' vendor_order.pk %}"
-            >
-                {% csrf_token %}
-
-                <label for="status">Select New Status</label>
-
-                <select name="status" id="status" required>
-                    {% for value, label in vendor_order.Status.choices %}
-                        <option
-                            value="{{ value }}"
-                            {% if vendor_order.status == value %}selected{% endif %}
-                        >
-                            {{ label }}
-                        </option>
-                    {% endfor %}
-                </select>
-
-                <button type="submit" class="btn-primary">
-                    Update Status
-                </button>
-            </form>
-        </div>
-
+<section class="welcome-section">
+    <div>
+        <p class="eyebrow">ORDER MANAGEMENT</p>
+        <h2>Order {{ vendor_order.order.order_number }}</h2>
+        <p class="welcome-description">
+            Review customer information, products and order progress.
+        </p>
     </div>
-</div>
+    <div class="welcome-mark">MH</div>
+</section>
+
+<section class="panel">
+    <div class="panel-heading">
+        <div>
+            <h3>Order Information</h3>
+            <p>Order {{ vendor_order.order.order_number }}</p>
+        </div>
+        <strong>{{ vendor_order.get_status_display }}</strong>
+    </div>
+
+    <div class="platform-detail">
+        <span>Order Date</span>
+        <strong>{{ vendor_order.created_at|date:"d M Y, H:i" }}</strong>
+    </div>
+
+    <div class="platform-detail">
+        <span>Payment Status</span>
+        <strong>{{ vendor_order.order.get_payment_status_display }}</strong>
+    </div>
+
+    <div class="platform-detail">
+        <span>Payment Method</span>
+        <strong>{{ vendor_order.order.get_payment_method_display }}</strong>
+    </div>
+</section>
+
+<section class="panel">
+    <div class="panel-heading">
+        <div>
+            <h3>Customer Information</h3>
+            <p>Delivery information supplied by the customer.</p>
+        </div>
+    </div>
+
+    <div class="platform-detail">
+        <span>Name</span>
+        <strong>{{ vendor_order.order.shipping_full_name }}</strong>
+    </div>
+
+    <div class="platform-detail">
+        <span>Phone</span>
+        <strong>{{ vendor_order.order.shipping_phone }}</strong>
+    </div>
+
+    <div class="platform-detail">
+        <span>Delivery Address</span>
+        <strong>{{ vendor_order.order.shipping_address }}</strong>
+    </div>
+
+    <div class="platform-detail">
+        <span>City</span>
+        <strong>{{ vendor_order.order.shipping_city }}</strong>
+    </div>
+
+    <div class="platform-detail">
+        <span>Region</span>
+        <strong>{{ vendor_order.order.shipping_region|default:"Not provided" }}</strong>
+    </div>
+
+    <div class="platform-detail">
+        <span>Country</span>
+        <strong>{{ vendor_order.order.shipping_country }}</strong>
+    </div>
+
+    {% if vendor_order.order.customer_note %}
+        <div class="platform-divider"></div>
+        <p><strong>Customer Note:</strong></p>
+        <p>{{ vendor_order.order.customer_note }}</p>
+    {% endif %}
+</section>
+
+<section class="panel">
+    <div class="panel-heading">
+        <div>
+            <h3>Products Ordered</h3>
+            <p>Items included in this vendor order.</p>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>SKU</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in vendor_order.items.all %}
+                    <tr>
+                        <td>{{ item.product_name }}</td>
+                        <td>{{ item.sku }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>UGX {{ item.unit_price|floatformat:0 }}</td>
+                        <td>UGX {{ item.line_total|floatformat:0 }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="platform-divider"></div>
+
+    <div class="platform-detail">
+        <span>Subtotal</span>
+        <strong>UGX {{ vendor_order.subtotal|floatformat:0 }}</strong>
+    </div>
+
+    <div class="platform-detail">
+        <span>Shipping</span>
+        <strong>UGX {{ vendor_order.shipping_cost|floatformat:0 }}</strong>
+    </div>
+
+    <div class="platform-detail">
+        <span>Total Amount</span>
+        <strong>UGX {{ vendor_order.total_amount|floatformat:0 }}</strong>
+    </div>
+</section>
+
+<section class="panel">
+    <div class="panel-heading">
+        <div>
+            <h3>Update Order Status</h3>
+            <p>Change the progress of this order.</p>
+        </div>
+    </div>
+
+    {% if vendor_order.status == "CANCELLED" %}
+        <p>This order has been cancelled and cannot be updated.</p>
+    {% else %}
+        <form
+            method="post"
+            action="{% url 'vendors:update_vendor_order_status' vendor_order.pk %}"
+        >
+            {% csrf_token %}
+
+            <label for="status">Select New Status</label>
+
+            <select name="status" id="status" required>
+                {% for value, label in vendor_order.Status.choices %}
+                    <option
+                        value="{{ value }}"
+                        {% if vendor_order.status == value %}selected{% endif %}
+                        {% if value == "CANCELLED" %}disabled{% endif %}
+                    >
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="button-primary">
+                Update Status
+            </button>
+        </form>
+    {% endif %}
+</section>
+
 {% endblock %}

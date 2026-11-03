@@ -1,89 +1,119 @@
-{% extends "products/base.html" %}
+{% extends "dashboards/base.html" %}
 
 {% block title %}{{ title }} | MarketHub{% endblock %}
 
-{% block content %}
-<div class="container">
-    <div class="vendor-product-form-page">
+{% block page_heading %}{{ title }}{% endblock %}
 
-        <div class="vendor-product-form-header">
-            <div>
-                <h1>{{ title }}</h1>
-                <p>Add or update a product in your store.</p>
+{% block user_role %}Marketplace Vendor{% endblock %}
+
+{% block sidebar_menu %}
+<a href="{% url 'vendors:vendor_dashboard' %}" class="sidebar-link">
+    <span>▦</span> Overview
+</a>
+
+<a href="{% url 'products:product_create' %}" class="sidebar-link active">
+    <span>＋</span> Add Product
+</a>
+
+{% endblock %}
+
+{% block content %}
+
+<section class="welcome-section">
+    <div>
+        <span class="eyebrow">PRODUCT MANAGEMENT</span>
+        <h1>{{ title }}</h1>
+        <p class="welcome-description">
+            Add a new product or update the details of an existing product
+            in your store.
+        </p>
+    </div>
+</section>
+
+<section class="panel">
+
+    <div class="panel-heading">
+        <div>
+            <h2>Product Information</h2>
+            <p>Complete the fields below to save your product.</p>
+        </div>
+
+        <a href="{% url 'products:my_products' %}" class="button-primary">
+            Back to My Products
+        </a>
+    </div>
+
+    <form method="post"
+          enctype="multipart/form-data"
+          class="vendor-product-form">
+
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="form-errors">
+                {{ form.non_field_errors }}
             </div>
+        {% endif %}
+
+        {% for field in form %}
+            <div class="form-group">
+
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                    {% if field.field.required %}
+                        <span>*</span>
+                    {% endif %}
+                </label>
+
+                {{ field }}
+
+                {% if field.help_text %}
+                    <small>{{ field.help_text }}</small>
+                {% endif %}
+
+                {% for error in field.errors %}
+                    <p class="field-error">{{ error }}</p>
+                {% endfor %}
+
+            </div>
+        {% endfor %}
+
+        {% if product and product.images.exists %}
+            <div class="existing-product-images">
+                <h3>Current Product Images</h3>
+
+                <div class="product-image-preview">
+                    {% for product_image in product.images.all %}
+                        <div class="product-image-item">
+
+                            <img
+                                src="{{ product_image.image.url }}"
+                                alt="{{ product_image.alt_text|default:product.name }}"
+                                width="120"
+                            >
+
+                            {% if product_image.is_primary %}
+                                <span>Primary Image</span>
+                            {% endif %}
+
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="vendor-product-form-actions">
+            <button type="submit" class="button-primary">
+                Save Product
+            </button>
 
             <a href="{% url 'products:my_products' %}">
-                Back to My Products
+                Cancel
             </a>
         </div>
 
-        <div class="vendor-product-form-card">
-            <form method="post"
-            enctype="multipart/form-data"
-            class="vendor-product-form">
-                {% csrf_token %}
+    </form>
 
-                {% if form.non_field_errors %}
-                    <div class="form-errors">
-                        {{ form.non_field_errors }}
-                    </div>
-                {% endif %}
+</section>
 
-                {% for field in form %}
-                    <div class="form-group">
-                        <label for="{{ field.id_for_label }}">
-                            {{ field.label }}
-                            {% if field.field.required %}
-                                <span>*</span>
-                            {% endif %}
-                        </label>
-
-                        {{ field }}
-
-                        {% if field.help_text %}
-                            <small>{{ field.help_text }}</small>
-                        {% endif %}
-
-                        {% for error in field.errors %}
-                            <p class="field-error">{{ error }}</p>
-                        {% endfor %}
-                    </div>
-                {% endfor %}
-
-                <div class="vendor-product-form-actions">
-                    <button type="submit" class="btn-primary">
-                        Save Product
-                    </button>
-
-                    <a href="{% url 'products:my_products' %}"
-                       class="btn-secondary">
-                        Cancel
-                    </a>
-                </div>
-                {% if product and product.images.exists %}
-    <div class="existing-product-images">
-        <h3>Current Product Images</h3>
-
-        <div class="product-image-preview">
-            {% for product_image in product.images.all %}
-                <div class="product-image-item">
-                    <img
-                        src="{{ product_image.image.url }}"
-                        alt="{{ product_image.alt_text|default:product.name }}"
-                        width="120"
-                    >
-
-                    {% if product_image.is_primary %}
-                        <span>Primary Image</span>
-                    {% endif %}
-                    </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endif %}
-            </form>
-        </div>
-
-    </div>
-</div>
 {% endblock %}

@@ -9,7 +9,9 @@ from products.models import Product, ProductVariant
 from .forms import CheckoutForm
 from .models import Order, OrderItem, VendorOrder
 from django.shortcuts import get_object_or_404, redirect, render
-
+from django.core.exceptions import PermissionDenied
+from django.db.models import Sum
+from django.views.decorators.http import require_POST
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -299,3 +301,91 @@ def order_detail(request, order_number):
         "orders/order_detail.html",
         {"order": order},
     )
+
+
+@login_required
+@require_POST
+def cancel_vendor_order(request, pk):
+    with transaction.atomic():
+        vendor_order = get_object_or_404(
+            VendorOrder.objects.select_for_update()
+            .select_related("order")
+            .prefetch_related("items"),
+            pk=pk,
+            order__customer=request.user,
+        )
+
+        if vendor_order.status == VendorOrder.Status.CANCELLED:
+            messages.info(request, "This vendor order has already been cancelled.")
+            return redirect(
+                "orders:order_detail",
+                order_number=vendor_order.order.order_number,
+            )
+
+        if vendor_order.status != VendorOrder.Status.PENDING:
+            messages.error(
+                request,
+                "Only pending vendor orders can be cancelled.",
+            )
+            return redirect(
+                "orders:order_detail",
+                order_number=vendor_order.order.order_number,
+            )
+
+        # Restore stock for this vendor's items only.
+        for item in vendor_order.items.all():
+            if item.variant_id:
+                variant = item.variant
+                if variant:
+                    variant.stock_quantity += item.quantity
+                    variant.save(update_fields=["stock_quantity"])
+            elif item.product_id:
+                product = item.product
+                if product:
+                    product.stock_quantity += item.quantity
+                    product.save(update_fields=["stock_quantity"])
+
+        vendor_order.status = VendorOrder.Status.CANCELLED
+        vendor_order.save(update_fields=["status", "updated_at"])
+
+        order = vendor_order.order
+        remaining_statuses = list(
+            order.vendor_orders.exclude(
+                status=VendorOrder.Status.CANCELLED
+            ).values_list("status", flat=True)
+        )
+
+        if not remaining_statuses:
+            order.status = Order.Status.CANCELLED
+        elif all(
+            status == VendorOrder.Status.DELIVERED
+            for status in remaining_statuses
+        ):
+            order.status = Order.Status.DELIVERED
+        elif any(
+            status == VendorOrder.Status.SHIPPED
+            for status in remaining_statuses
+        ):
+            order.status = Order.Status.SHIPPED
+        elif any(
+            status == VendorOrder.Status.PROCESSING
+            for status in remaining_statuses
+        ):
+            order.status = Order.Status.PROCESSING
+        elif any(
+            status == VendorOrder.Status.ACCEPTED
+            for status in remaining_statuses
+        ):
+            order.status = Order.Status.CONFIRMED
+        else:
+            order.status = Order.Status.PENDING
+
+        order.save(update_fields=["status", "updated_at"])
+
+    messages.success(request, "The vendor order was cancelled successfully.")
+
+    return redirect(
+        "orders:order_detail",
+        order_number=vendor_order.order.order_number,
+    )
+
