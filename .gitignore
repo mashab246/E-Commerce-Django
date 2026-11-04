@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Local AI assistant instructions
+CLAUDE.md
+
 
 # Environment / secrets
 .env
