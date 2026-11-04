@@ -69,17 +69,33 @@ def vendor_dashboard(request):
     )
 
 
+
 @login_required
 def vendor_register(request):
-    if hasattr(request.user, "vendor_profile"):
+    vendor = Vendor.objects.filter(user=request.user).first()
+
+    # Approved vendors cannot submit another application.
+    if vendor and vendor.status == Vendor.Status.APPROVED:
         messages.info(
             request,
-            "You already have a vendor application."
+            "Your vendor account is already approved."
+        )
+        return redirect("vendors:vendor_dashboard")
+
+    # Suspended vendors must contact the administrator.
+    if vendor and vendor.status == Vendor.Status.SUSPENDED:
+        messages.error(
+            request,
+            "Your vendor account is suspended. "
+            "Please contact the administrator."
         )
         return redirect("vendors:vendor_dashboard")
 
     if request.method == "POST":
-        form = VendorRegistrationForm(request.POST)
+        form = VendorRegistrationForm(
+            request.POST,
+            instance=vendor,
+        )
 
         if form.is_valid():
             vendor = form.save(commit=False)
@@ -99,12 +115,15 @@ def vendor_register(request):
             return redirect("vendors:vendor_dashboard")
 
     else:
-        form = VendorRegistrationForm()
+        form = VendorRegistrationForm(instance=vendor)
 
     return render(
         request,
         "vendors/vendor_register.html",
-        {"form": form},
+        {
+            "form": form,
+            "vendor": vendor,
+        },
     )
 
 @login_required

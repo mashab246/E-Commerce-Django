@@ -44,6 +44,7 @@ def vendor_approvals(request):
     return render(request, "dashboards/vendor_approvals.html", context)
 
 
+
 @login_required
 @user_passes_test(is_marketplace_admin)
 @require_POST
@@ -51,6 +52,7 @@ def update_vendor_status(request, vendor_id):
     vendor = get_object_or_404(Vendor, pk=vendor_id)
 
     new_status = request.POST.get("status")
+
     allowed_statuses = {
         Vendor.Status.APPROVED,
         Vendor.Status.REJECTED,
@@ -64,12 +66,23 @@ def update_vendor_status(request, vendor_id):
     vendor.status = new_status
     vendor.save(update_fields=["status", "updated_at"])
 
+    # Update the user's role based on the vendor decision.
+    if new_status == Vendor.Status.APPROVED:
+        vendor.user.role = vendor.user.Role.VENDOR
+        vendor.user.save(update_fields=["role"])
+
+    elif new_status == Vendor.Status.REJECTED:
+        vendor.user.role = vendor.user.Role.CUSTOMER
+        vendor.user.save(update_fields=["role"])
+
     messages.success(
         request,
-        f"{vendor.store_name} status updated to {vendor.get_status_display()}."
+        f"{vendor.store_name} status updated to "
+        f"{vendor.get_status_display()}."
     )
 
     return redirect("vendor_approvals")
+
 
 @login_required
 @user_passes_test(is_marketplace_admin)
