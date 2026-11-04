@@ -1,38 +1,14 @@
-# Byte-compiled / optimized files
+# Python generated files
 __pycache__/
 *.py[cod]
-*$py.class
 
-# Local AI assistant instructions
-CLAUDE.md
-
-
-# Environment / secrets
-.env
-.env.*
-*.env
-
-# Virtual environments
-venv/
-env/
-ENV/
-.venv/
-
-# Distribution / packaging
-build/
-dist/
-*.egg-info/
-*.egg
-
-# Static files (collected)
+# Django generated files
 staticfiles/
+media/
+db.sqlite3
 
-# Editors / OS
-.vscode/
-.idea/
-*.swp
-.DS_Store
-Thumbs.db
+# Environment variables
+.env
 
 # Testing / coverage
 .coverage

@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
+from django.core.validators import MinValueValidator
+
  
 
 class Category(models.Model):
@@ -84,7 +86,7 @@ class Product(models.Model):
     sku = models.CharField(max_length=100)
 
     description = models.TextField()
-    price = models.DecimalField(max_digits=12, decimal_places=2)
+    price = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0.01)])
 
     stock_quantity = models.PositiveIntegerField(default=0)
 
@@ -155,8 +157,8 @@ class ProductVariant(models.Model):
         decimal_places=2,
         null=True,
         blank=True,
+        validators=[MinValueValidator(0.01)]
     )
-
     stock_quantity = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
