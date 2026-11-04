@@ -119,9 +119,37 @@ def product_detail(request, pk, slug):
     )
 
 
+
 @login_required
 def my_products(request):
     vendor = get_vendor_for_user(request.user)
+
+    if request.method == "POST":
+        form = ProductForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            product = form.save(commit=False)
+            product.vendor = vendor
+            product.save()
+
+            uploaded_images = form.cleaned_data.get("images", [])
+
+            for index, image in enumerate(uploaded_images):
+                ProductImage.objects.create(
+                    product=product,
+                    image=image,
+                    is_primary=(index == 0),
+                )
+
+            messages.success(
+                request,
+                "Product created successfully."
+            )
+
+            return redirect("products:my_products")
+
+    else:
+        form = ProductForm()
 
     products = (
         Product.objects.filter(vendor=vendor)
@@ -132,8 +160,12 @@ def my_products(request):
     return render(
         request,
         "products/my_products.html",
-        {"products": products},
+        {
+            "products": products,
+            "form": form,
+        },
     )
+
 
 
 @login_required

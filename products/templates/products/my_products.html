@@ -1,4 +1,5 @@
 
+
 {% extends "dashboards/base.html" %}
 
 {% block title %}My Products | MarketHub{% endblock %}
@@ -14,11 +15,6 @@
 <a href="{% url 'products:my_products' %}" class="sidebar-link active">
     <span class="sidebar-icon">▤</span>
     <span>My Products</span>
-</a>
-
-<a href="{% url 'products:product_create' %}" class="sidebar-link">
-    <span class="sidebar-icon">＋</span>
-    <span>Add Product</span>
 </a>
 
 {% endblock %}
@@ -43,6 +39,9 @@
             <p>View, edit and manage your product listings.</p>
         </div>
 
+        <button type="button" class="button-primary" id="openProductModal">
+            + Add Product
+        </button>
     </div>
 
     {% if products %}
@@ -80,9 +79,7 @@
                                     <a href="{% url 'products:product_update' product.pk %}">
                                         Edit
                                     </a>
-
                                     |
-
                                     <a href="{% url 'products:product_delete' product.pk %}">
                                         Archive
                                     </a>
@@ -101,11 +98,115 @@
             <h3>No products yet</h3>
             <p>You haven't added any products to your store.</p>
 
-            <a href="{% url 'products:product_create' %}" class="button-primary">
+            <button type="button" class="button-primary" id="openFirstProductModal">
                 Add Your First Product
-            </a>
+            </button>
         </div>
     {% endif %}
 </section>
+
+<!-- Add Product Modal -->
+<div class="product-modal-overlay" id="productModal">
+    <div class="product-modal">
+        <div class="product-modal-header">
+            <div>
+                <p class="eyebrow">PRODUCT MANAGEMENT</p>
+                <h2>Add New Product</h2>
+                <p>Enter the details of the product you want to list.</p>
+            </div>
+
+            <button type="button" class="modal-close" id="closeProductModal">
+                &times;
+            </button>
+        </div>
+
+        <form method="POST"
+              action="{% url 'products:my_products' %}"
+              enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="form-errors">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="product-modal-body">
+                {% for field in form %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
+
+                        {{ field }}
+
+                        {% if field.help_text %}
+                            <small>{{ field.help_text }}</small>
+                        {% endif %}
+
+                        {% for error in field.errors %}
+                            <small class="field-error">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="product-modal-footer">
+                <button type="button" class="button-secondary" id="cancelProductModal">
+                    Cancel
+                </button>
+
+                <button type="submit" class="button-primary">
+                    Save Product
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("productModal");
+    const openButton = document.getElementById("openProductModal");
+    const firstProductButton = document.getElementById("openFirstProductModal");
+    const closeButton = document.getElementById("closeProductModal");
+    const cancelButton = document.getElementById("cancelProductModal");
+
+    function openModal() {
+        modal.classList.add("active");
+    }
+
+    function closeModal() {
+        modal.classList.remove("active");
+    }
+
+    if (openButton) {
+        openButton.addEventListener("click", openModal);
+    }
+
+    if (firstProductButton) {
+        firstProductButton.addEventListener("click", openModal);
+    }
+
+    closeButton.addEventListener("click", closeModal);
+    cancelButton.addEventListener("click", closeModal);
+
+    modal.addEventListener("click", function (event) {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+            closeModal();
+        }
+    });
+
+    {% if form.errors %}
+        openModal();
+    {% endif %}
+});
+</script>
 
 {% endblock %}
