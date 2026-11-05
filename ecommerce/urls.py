@@ -17,11 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from django.conf import settings
+from django.views.generic import RedirectView
 from django.conf.urls.static import static
 from .views import admin_dashboard, vendor_approvals, update_vendor_status, user_management, toggle_user_status, product_management, category_management, category_create, category_edit, toggle_category_status, admin_product_edit, update_product_status, order_management, admin_order_detail, update_order_status, payment_management
 
 
 urlpatterns = [
+    path("", RedirectView.as_view(url="/products/", permanent=False), name="home"),
     path('admin/', admin.site.urls),
     path("dashboard/admin/", admin_dashboard, name="admin_dashboard"),
     path("products/", include("products.urls")),
