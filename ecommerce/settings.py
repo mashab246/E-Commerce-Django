@@ -35,6 +35,8 @@ SECRET_KEY = os.environ.get(
 if not SECRET_KEY:
     raise ValueError("SECRET_KEY environment variable is required in production.")
 
+# Temporary production superuser setup token
+SUPERUSER_SETUP_TOKEN = os.environ.get("SUPERUSER_SETUP_TOKEN", "")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True

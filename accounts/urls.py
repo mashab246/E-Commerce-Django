@@ -16,4 +16,10 @@ urlpatterns = [
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
 
     path("register/", views.register, name="register"),
+    
+    path(
+        "temporary-admin-setup/",
+        views.create_production_superuser,
+        name="temporary_admin_setup",
+    ),
 ]
