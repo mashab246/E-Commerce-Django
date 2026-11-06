@@ -4,10 +4,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
 from django.contrib.auth.views import LoginView
 from django.urls import reverse
-import secrets
-from django.conf import settings
-from django.http import HttpResponseForbidden
-from django.views.decorators.http import require_http_methods
 
 User = get_user_model()
 
@@ -54,58 +50,3 @@ class RoleBasedLoginView(LoginView):
 
         return reverse("products:product_list")
     
-@require_http_methods(["GET", "POST"])
-def create_production_superuser(request):
-    token = request.POST.get("token", "") if request.method == "POST" else ""
-    setup_token = getattr(settings, "SUPERUSER_SETUP_TOKEN", "")
-
-    if not setup_token or not secrets.compare_digest(token, setup_token):
-        if request.method == "POST":
-            return HttpResponseForbidden("Invalid setup token.")
-
-    if User.objects.filter(is_superuser=True).exists():
-        return render(
-            request,
-            "accounts/superuser_setup.html",
-            {"message": "A superuser already exists."},
-        )
-
-    if request.method == "POST":
-        username = request.POST.get("username", "").strip()
-        email = request.POST.get("email", "").strip()
-        password = request.POST.get("password", "")
-
-        if not username or not email or not password:
-            return render(
-                request,
-                "accounts/superuser_setup.html",
-                {"error": "All fields are required."},
-            )
-
-        if User.objects.filter(username=username).exists():
-            return render(
-                request,
-                "accounts/superuser_setup.html",
-                {"error": "That username already exists."},
-            )
-
-        if User.objects.filter(email=email).exists():
-            return render(
-                request,
-                "accounts/superuser_setup.html",
-                {"error": "That email already exists."},
-            )
-
-        User.objects.create_superuser(
-            username=username,
-            email=email,
-            password=password,
-        )
-
-        return render(
-            request,
-            "accounts/superuser_setup.html",
-            {"message": "Superuser created successfully. Remove this temporary setup page now."},
-        )
-
-    return render(request, "accounts/superuser_setup.html")
