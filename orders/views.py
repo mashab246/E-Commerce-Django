@@ -43,7 +43,7 @@ def checkout(request):
                     )
 
                     cart_items = list(
-                        CartItem.objects.select_for_update()
+                        CartItem.objects.select_for_update(of=("self",))
                         .filter(cart=locked_cart)
                         .select_related(
                             "product",
