@@ -12,6 +12,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.core.exceptions import PermissionDenied
 from django.db.models import Sum
 from django.views.decorators.http import require_POST
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -210,6 +214,15 @@ def checkout(request):
                     order_number=order.order_number,
                 )
 
+                """except (
+                    ValueError,
+                    Product.DoesNotExist,
+                    ProductVariant.DoesNotExist,
+                    Cart.DoesNotExist,
+                ) as error:
+                    messages.error(request, str(error))
+                    return redirect("cart:cart_detail")"""
+                
             except (
                 ValueError,
                 Product.DoesNotExist,
@@ -217,6 +230,14 @@ def checkout(request):
                 Cart.DoesNotExist,
             ) as error:
                 messages.error(request, str(error))
+                return redirect("cart:cart_detail")
+
+            except Exception:
+                logger.exception("Unexpected error during checkout")
+                messages.error(
+                    request,
+                    "We could not place your order. Please try again."
+                )
                 return redirect("cart:cart_detail")
 
     else:

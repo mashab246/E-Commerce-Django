@@ -209,3 +209,21 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # Enable HSTS only in production
 SECURE_HSTS_SECONDS = 3600 if not DEBUG else 0
+
+# Application error logging
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": True,
+        },
+    },
+}
