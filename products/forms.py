@@ -41,7 +41,6 @@ class ProductForm(forms.ModelForm):
             "description",
             "price",
             "stock_quantity",
-            "status",
         ]
         widgets = {
             "description": forms.Textarea(attrs={"rows": 5}),

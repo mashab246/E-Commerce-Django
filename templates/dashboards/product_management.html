@@ -10,7 +10,6 @@
 <a href="{% url 'product_management' %}" class="sidebar-link active">
     Products
 </a>
-
 {% endblock %}
 
 {% block page_heading %}
@@ -33,11 +32,6 @@ Administrator
     <div class="stat-card">
         <div class="stat-label">Published</div>
         <div class="stat-value">{{ published_products }}</div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-label">Drafts</div>
-        <div class="stat-value">{{ draft_products }}</div>
     </div>
 
     <div class="stat-card">
@@ -64,11 +58,6 @@ Administrator
 
         <select name="status">
             <option value="">All statuses</option>
-
-            <option value="DRAFT"
-                {% if status_filter == "DRAFT" %}selected{% endif %}>
-                Draft
-            </option>
 
             <option value="PUBLISHED"
                 {% if status_filter == "PUBLISHED" %}selected{% endif %}>
@@ -111,7 +100,40 @@ Administrator
             <tbody>
                 {% for product in products %}
                     <tr>
-                        <td>{{ product.name }}</td>
+                        <td>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                {% with product_image=product.images.all|first %}
+                                    {% if product_image and product_image.image %}
+                                        <img
+                                            src="{{ product_image.image.url }}"
+                                            alt="{{ product.name }}"
+                                            style="width:48px; height:48px; object-fit:cover; border-radius:7px;"
+                                        >
+                                    {% else %}
+                                        <div style="width:48px; height:48px; display:flex; align-items:center; justify-content:center; background:#f1f5f9; border-radius:7px; font-size:22px; color:#94a3b8;">
+                                            ▧
+                                        </div>
+                                    {% endif %}
+                                {% endwith %}
+
+                                <div class="admin-product-info">
+                                    {% with primary_image=product.images.all|first %}
+                                        {% if primary_image %}
+                                            <img
+                                                src="{{ primary_image.image.url }}"
+                                                alt="{{ product.name }}"
+                                                class="admin-product-image"
+                                            >
+                                        {% else %}
+                                            <div class="admin-product-placeholder">▧</div>
+                                        {% endif %}
+                                    {% endwith %}
+
+                                    <strong>{{ product.name }}</strong>
+                                </div>
+                            </div>
+                        </td>
+
                         <td>{{ product.sku }}</td>
                         <td>{{ product.vendor.store_name }}</td>
                         <td>{{ product.category.name }}</td>
@@ -123,10 +145,6 @@ Administrator
                                 <span class="status-badge status-approved">
                                     Published
                                 </span>
-                            {% elif product.status == "DRAFT" %}
-                                <span class="status-badge">
-                                    Draft
-                                </span>
                             {% else %}
                                 <span class="status-badge status-rejected">
                                     Archived
@@ -137,44 +155,47 @@ Administrator
                         <td>{{ product.created_at|date:"M d, Y" }}</td>
 
                         <td class="product-actions">
+
                             <a
                                 href="{% url 'products:product_detail' product.pk product.slug %}"
                                 class="product-view-btn"
                             >
                                 View
                             </a>
-                            
+
                             <form
                                 method="post"
                                 action="{% url 'update_product_status' product.pk %}"
                             >
                                 {% csrf_token %}
 
-                                <select name="status" aria-label="New product status">
-                                    {% if product.status != "DRAFT" %}
-                                        <option value="DRAFT">Set to Draft</option>
-                                    {% endif %}
+                                {% if product.status == "PUBLISHED" %}
+                                    <input type="hidden" name="status" value="ARCHIVED">
+                                    <button type="submit" class="product-status-btn">
+                                        Archive
+                                    </button>
+                                {% else %}
+                                    <input type="hidden" name="status" value="PUBLISHED">
+                                    <button type="submit" class="product-status-btn">
+                                        Publish
+                                    </button>
+                                {% endif %}
 
-                                    {% if product.status != "PUBLISHED" %}
-                                        <option value="PUBLISHED">Publish</option>
-                                    {% endif %}
-
-                                    {% if product.status != "ARCHIVED" %}
-                                        <option value="ARCHIVED">Archive</option>
-                                    {% endif %}
-                                </select>
-
-                                <button type="submit" class="product-status-btn">
-                                    Update Status
-                                </button>
                             </form>
+
+                            <a
+                                href="{% url 'admin_product_edit' product.pk %}"
+                                class="product-view-btn"
+                            >
+                                Edit
+                            </a>
 
                         </td>
                     </tr>
 
                 {% empty %}
                     <tr>
-                        <td colspan="8">
+                        <td colspan="9">
                             No products found.
                         </td>
                     </tr>

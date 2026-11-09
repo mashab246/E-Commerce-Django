@@ -188,9 +188,6 @@ def product_management(request):
         "published_products": Product.objects.filter(
             status=Product.Status.PUBLISHED
         ).count(),
-        "draft_products": Product.objects.filter(
-            status=Product.Status.DRAFT
-        ).count(),
         "archived_products": Product.objects.filter(
             status=Product.Status.ARCHIVED
         ).count(),
@@ -354,7 +351,6 @@ def update_product_status(request, product_id):
     new_status = request.POST.get("status")
 
     allowed_statuses = {
-        Product.Status.DRAFT,
         Product.Status.PUBLISHED,
         Product.Status.ARCHIVED,
     }

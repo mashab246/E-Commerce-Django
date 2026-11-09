@@ -55,7 +55,6 @@ class Brand(models.Model):
 class Product(models.Model):
 
     class Status(models.TextChoices):
-        DRAFT = "DRAFT", "Draft"
         PUBLISHED = "PUBLISHED", "Published"
         ARCHIVED = "ARCHIVED", "Archived"
 
@@ -93,7 +92,7 @@ class Product(models.Model):
     status = models.CharField(
         max_length=10,
         choices=Status.choices,
-        default=Status.DRAFT,
+        default=Status.PUBLISHED,
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
