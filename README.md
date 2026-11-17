@@ -2,11 +2,19 @@
 
 MarketHub is a Django-based multi-vendor e-commerce marketplace designed to connect customers with different vendors through one online shopping platform.
 
-The platform allows customers to browse products, manage shopping carts and place orders, while vendors can manage their stores, products and customer orders. Marketplace administrators oversee users, vendors, products and platform activities.
+The platform enables customers to browse products, manage shopping carts and place orders. Vendors can manage their stores, products and customer orders, while marketplace administrators oversee users, vendors, products and platform activities.
+
+## Group Members
+
+| No. | Full Name       | Registration Number |
+| --- | --------------- | ------------------- |
+| 1   | Galiwango Musa  | 224-063011-29512    |
+| 2   | Walusimbi Adnan | 224-063011-29698    |
 
 ## Features
 
 ### Customer Features
+
 - User registration and authentication.
 - Browse products and product categories.
 - View individual product details.
@@ -15,6 +23,7 @@ The platform allows customers to browse products, manage shopping carts and plac
 - Place and manage orders.
 
 ### Vendor Features
+
 - Apply to become a marketplace vendor.
 - Vendor approval workflow.
 - Vendor dashboard.
@@ -25,6 +34,7 @@ The platform allows customers to browse products, manage shopping carts and plac
 - Track order processing statuses.
 
 ### Administrator Features
+
 - Administrative dashboard.
 - Manage marketplace users.
 - Review vendor applications.
@@ -34,16 +44,20 @@ The platform allows customers to browse products, manage shopping carts and plac
 
 ## Technologies Used
 
-| Technology | Purpose |
-|---|---|
-| Python | Backend programming language |
-| Django | Web framework |
-| SQLite | Development database |
-| HTML5 | Page structure |
-| CSS3 | Styling and layout |
-| JavaScript | Frontend interactions |
-| Pillow | Image processing |
-| Git and GitHub | Version control |
+| Technology     | Purpose                            |
+| -------------- | ---------------------------------- |
+| Python         | Backend programming language       |
+| Django         | Web framework                      |
+| SQLite         | Local development database         |
+| PostgreSQL     | Production database                |
+| HTML5          | Page structure                     |
+| CSS3           | Styling and layout                 |
+| JavaScript     | Frontend interactions              |
+| Pillow         | Image processing                   |
+| Cloudinary     | Cloud media storage                |
+| WhiteNoise     | Static file serving                |
+| Git and GitHub | Version control                    |
+| Render         | Application hosting and deployment |
 
 ## Project Structure
 
@@ -107,7 +121,7 @@ pip install -r requirements.txt
 python manage.py migrate
 ```
 
-### 7. Create an Administrator Account
+### 7. Create an Administrator Account on a local account
 
 ```bash
 python manage.py createsuperuser
@@ -125,9 +139,15 @@ Open your browser and visit:
 http://127.0.0.1:8000/
 ```
 
+## Live Deployment
+
+MarketHub is deployed using Render.
+
+**Live Application:** [https://markethub-78ox.onrender.com/](https://markethub-78ox.onrender.com/)
+
 ## Development Status
 
-MarketHub is under active development. Features and improvements are being added as the project progresses.
+MarketHub has been developed with customer, vendor and administrator functionalities. The application has been deployed and is available online.
 
 ## Future Improvements
 
@@ -136,13 +156,13 @@ MarketHub is under active development. Features and improvements are being added
 - Customer reviews and ratings.
 - Email notifications.
 - Advanced product search and filtering.
-- Production deployment.
 
-## Author
+## Authors
 
-**Masha B.**
-
+**Galiwango Musa**
 GitHub: [@mashab246](https://github.com/mashab246)
+
+**Walusimbi Adnan**
 
 ---
 
