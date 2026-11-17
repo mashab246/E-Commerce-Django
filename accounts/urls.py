@@ -16,9 +16,4 @@ urlpatterns = [
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
 
     path("register/", views.register, name="register"),
-    path(
-        "temporary-superuser-setup/",
-        views.create_temporary_superuser,
-        name="temporary_superuser_setup",
-    ),
 ]
