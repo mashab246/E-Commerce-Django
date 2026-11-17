@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>EcommercePlatform</title>
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+    <body>
+        <nav>
+            <h2>EcommercePlatform</h2>
+            <div>
+                <a href="home.html">Home</a>
+                <a href="product2.html">Products</a>
+                <a href="category.html">Categories</a>
+                <a href="shopping_cart.html">Cart</a>
+                <a href="order.html">Orders</a>
+                <a href="login.html">Login</a>
+                <a href="customer.html">customer</a>
+                <a href="inventory_manager.html">inventory_manager</a>
+                <a href="order_item.html">order_item</a>
+                <a href="register.html">register</a>
+                <a href="vendor.html">vendor</a>
+            </div>
+        </nav>
+        <main class="container">
+            <section class="page-title">
+                <h1>Order Management</h1>
+                <p>Create and manage customer orders.</p>
+            </section>
+            <section class="card">
+                <h2>Create Order</h2>
+                <form>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Order Number</label>
+                            <input placeholder="ORD001">
+                        </div>
+                        <div class="form-group">
+                            <label>Customer</label>
+                            <input placeholder="Customer ID">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select>
+                            <option>Pending</option>
+                            <option>Processing</option>
+                            <option>Shipped</option>
+                            <option>Delivered</option>
+                            <option>Cancelled</option>
+                        </select>
+                    </div>
+                    <button class="full-button">Create Order</button>
+                </form>
+            </section>
+            <section class="card">
+                <h2>Order Records</h2>
+                <div class="table-wrapper">
+                    <table>
+                        <tr>
+                            <th>Order No.</th>
+                            <th>Customer</th>
+                            <th>Status</th>
+                            <th>Total Amount</th>
+                            <th>Items</th>
+                        </tr>
+                        <tr>
+                            <td>ORD001</td>
+                            <td>C001 - Galiwango Musa</td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td class="amount">UGX 2,500,000</td>
+                            <td>2</td>
+                        </tr>
+                        <tr>
+                            <td>ORD002</td>
+                            <td>C002 - Walusimbi Adnan</td>
+                            <td><span class="status processing">Processing</span></td>
+                            <td class="amount">UGX 1,850,000</td>
+                            <td>3</td>
+                        </tr>
+                        <tr>
+                            <td>ORD003</td>
+                            <td>C003 - Ssegujja Farahan</td>
+                            <td><span class="status shipped">Shipped</span></td>
+                            <td class="amount">UGX 750,000</td>
+                            <td>2</td>
+                        </tr>
+                    </table>
+                </div>
+            </section>
+        </main>
+        <footer>
+            <p>© 2026 MyShop. E-Commerce Management System.</p>
+        </footer>
+    </body>
+</html>

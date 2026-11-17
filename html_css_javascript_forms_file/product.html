@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>EcommercePlatform</title>
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+    <body>
+        <nav>
+            <h2>EcommercePlatform</h2>
+            <div>
+                <a href="home.html">Home</a>
+                <a href="product2.html">Products</a>
+                <a href="category.html">Categories</a>
+                <a href="shopping_cart.html">Cart</a>
+                <a href="order.html">Orders</a>
+                <a href="login.html">Login</a>
+                <a href="customer.html">customer</a>
+                <a href="inventory_manager.html">inventory_manager</a>
+                <a href="order_item.html">order_item</a>
+                <a href="register.html">register</a>
+                <a href="vendor.html">vendor</a>
+            </div>
+        </nav>
+        <main class="container">
+            <section class="page-title">
+                <h1>Product Management</h1>
+                <p>View and manage products.</p>
+            </section>
+            <section class="card">
+                <h2>Add Product</h2>
+                <form>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input>
+                        </div>
+                        <div class="form-group">
+                            <label>Brand</label>
+                            <input>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea rows="3"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Price (UGX)</label>
+                            <input type="number">
+                        </div>
+                        <div class="form-group">
+                            <label>Available Stock</label>
+                            <input type="number">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Vendor</label>
+                            <input>
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <input>
+                        </div>
+                    </div>
+                    <button class="full-button">Add Product</button>
+                </form>
+            </section>
+            <section class="card">
+                <h2>Product Records</h2>
+                <div class="table-wrapper">
+                    <table>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Brand</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Vendor</th>
+                            <th>Category</th>
+                        </tr>
+                        <tr>
+                            <td>P001</td>
+                            <td>HP Laptop</td>
+                            <td>HP</td>
+                            <td>UGX 2,500,000</td>
+                            <td>10</td>
+                            <td>Tech Uganda</td>
+                            <td>Electronics</td>
+                        </tr>
+                        <tr>
+                            <td>P002</td>
+                            <td>Samsung Phone</td>
+                            <td>Samsung</td>
+                            <td>UGX 1,200,000</td>
+                            <td>15</td>
+                            <td>Mobile Hub</td>
+                            <td>Electronics</td>
+                        </tr>
+                        <tr>
+                            <td>P003</td>
+                            <td>Nike Shoes</td>
+                            <td>Nike</td>
+                            <td>UGX 250,000</td>
+                            <td>20</td>
+                            <td>Fashion Store</td>
+                            <td>Shoes</td>
+                        </tr>
+                    </table>
+                </div>
+            </section>
+        </main>
+        <footer>
+            <p>© 2026 MyShop. E-Commerce Management System.</p>
+        </footer>
+    </body>
+</html>

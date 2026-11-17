@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>EcommercePlatform</title>
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+    <body>
+        <nav>
+            <h2>EcommercePlatform</h2>
+            <div>
+                <a href="home.html">Home</a>
+                <a href="product2.html">Products</a>
+                <a href="category.html">Categories</a>
+                <a href="shopping_cart.html">Cart</a>
+                <a href="order.html">Orders</a>
+                <a href="login.html">Login</a>
+                <a href="customer.html">customer</a>
+                <a href="inventory_manager.html">inventory_manager</a>
+                <a href="order_item.html">order_item</a>
+                <a href="register.html">register</a>
+                <a href="vendor.html">vendor</a>
+            </div>
+        </nav>
+        <main class="container">
+            <section class="page-title">
+                <h1>Order Items</h1>
+                <p>Manage products included in customer orders.</p>
+            </section>
+            <section class="card">
+                <h2>Add Order Item</h2>
+                <form>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Order Number</label>
+                            <input placeholder="ORD001">
+                        </div>
+                        <div class="form-group">
+                            <label>Product ID</label>
+                            <input placeholder="P001">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Quantity</label>
+                            <input type="number" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Amount (UGX)</label>
+                            <input type="number" readonly>
+                        </div>
+                    </div>
+                    <button class="full-button">Add Order Item</button>
+                </form>
+            </section>
+            <section class="card">
+                <h2>Order Item Records</h2>
+                <div class="table-wrapper">
+                    <table>
+                        <tr>
+                            <th>Order No.</th>
+                            <th>Product ID</th>
+                            <th>Product</th>
+                            <th>Unit Price</th>
+                            <th>Quantity</th>
+                            <th>Amount</th>
+                        </tr>
+                        <tr>
+                            <td>ORD001</td>
+                            <td>P001</td>
+                            <td>HP Laptop</td>
+                            <td>2,500,000</td>
+                            <td>1</td>
+                            <td class="amount">2,500,000</td>
+                        </tr>
+                        <tr>
+                            <td>ORD002</td>
+                            <td>P002</td>
+                            <td>Samsung Phone</td>
+                            <td>1,200,000</td>
+                            <td>1</td>
+                            <td class="amount">1,200,000</td>
+                        </tr>
+                        <tr>
+                            <td>ORD002</td>
+                            <td>P004</td>
+                            <td>Cotton Shirt</td>
+                            <td>80,000</td>
+                            <td>2</td>
+                            <td class="amount">160,000</td>
+                        </tr>
+                    </table>
+                </div>
+            </section>
+        </main>
+        <footer>
+            <p>© 2026 MyShop. E-Commerce Management System.</p>
+        </footer>
+    </body>
+</html>
