@@ -1,0 +1,28 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarketHub Admin Setup</title>
+</head>
+<body>
+    <h2>MarketHub Admin Setup</h2>
+
+    <p>Enter the temporary setup code to create the administrator account.</p>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <label for="setup_code">Setup Code:</label>
+        <input
+            type="password"
+            id="setup_code"
+            name="setup_code"
+            required
+        >
+
+        <button type="submit">Create Admin Account</button>
+    </form>
+</body>
+</html>
